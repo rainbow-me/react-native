@@ -7,6 +7,7 @@
 
 package com.facebook.react.modules.statusbar;
 
+import android.view.WindowInsetsController;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
@@ -184,22 +185,33 @@ public class StatusBarModule extends NativeStatusBarManagerAndroidSpec {
       return;
     }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      UiThreadUtil.runOnUiThread(
-          new Runnable() {
-            @TargetApi(Build.VERSION_CODES.M)
-            @Override
-            public void run() {
-              View decorView = activity.getWindow().getDecorView();
-              int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
-              if ("dark-content".equals(style)) {
-                systemUiVisibilityFlags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-              } else {
-                systemUiVisibilityFlags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-              }
-              decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+    UiThreadUtil.runOnUiThread(
+      new Runnable() {
+        @TargetApi(Build.VERSION_CODES.R)
+        @Override
+        public void run() {
+          if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+            WindowInsetsController insetsController = activity.getWindow().getInsetsController();
+            if ("dark-content".equals(style)) {
+              // dark-content means dark icons on a light status bar
+              insetsController.setSystemBarsAppearance(
+                  WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                  WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+            } else {
+              insetsController.setSystemBarsAppearance(
+                  0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
             }
-          });
-    }
+          } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View decorView = activity.getWindow().getDecorView();
+            int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
+            if ("dark-content".equals(style)) {
+              systemUiVisibilityFlags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            } else {
+              systemUiVisibilityFlags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            }
+            decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+          }
+        }
+      });
   }
 }
