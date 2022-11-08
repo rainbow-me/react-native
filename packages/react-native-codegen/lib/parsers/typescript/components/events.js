@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function getPropertyType(name, optional, typeAnnotation) {
@@ -14,7 +15,6 @@ function getPropertyType(name, optional, typeAnnotation) {
     typeAnnotation.type === 'TSTypeReference'
       ? typeAnnotation.typeName.name
       : typeAnnotation.type;
-
   switch (type) {
     case 'TSBooleanKeyword':
       return {
@@ -24,7 +24,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'BooleanTypeAnnotation',
         },
       };
-
     case 'TSStringKeyword':
       return {
         name,
@@ -33,7 +32,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'StringTypeAnnotation',
         },
       };
-
     case 'Int32':
       return {
         name,
@@ -42,7 +40,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'Int32TypeAnnotation',
         },
       };
-
     case 'Double':
       return {
         name,
@@ -51,7 +48,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'DoubleTypeAnnotation',
         },
       };
-
     case 'Float':
       return {
         name,
@@ -60,14 +56,12 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'FloatTypeAnnotation',
         },
       };
-
     case 'Readonly':
       return getPropertyType(
         name,
         optional,
         typeAnnotation.typeParameters.params[0],
       );
-
     case 'TSTypeLiteral':
       return {
         name,
@@ -77,7 +71,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           properties: typeAnnotation.members.map(buildPropertiesForEvent),
         },
       };
-
     case 'TSUnionType':
       // Check for <T | null | void>
       if (
@@ -87,15 +80,14 @@ function getPropertyType(name, optional, typeAnnotation) {
       ) {
         const optionalType = typeAnnotation.types.filter(
           t => t.type !== 'TSNullKeyword' && t.type !== 'TSVoidKeyword',
-        )[0]; // Check for <(T | T2) | null | void>
+        )[0];
 
+        // Check for <(T | T2) | null | void>
         if (optionalType.type === 'TSParenthesizedType') {
           return getPropertyType(name, true, optionalType.typeAnnotation);
         }
-
         return getPropertyType(name, true, optionalType);
       }
-
       return {
         name,
         optional,
@@ -104,13 +96,11 @@ function getPropertyType(name, optional, typeAnnotation) {
           options: typeAnnotation.types.map(option => option.literal.value),
         },
       };
-
     default:
       type;
       throw new Error(`Unable to determine event type for "${name}": ${type}`);
   }
 }
-
 function findEventArgumentsAndType(
   typeAnnotation,
   types,
@@ -120,9 +110,7 @@ function findEventArgumentsAndType(
   if (!typeAnnotation.typeName) {
     throw new Error("typeAnnotation of event doesn't have a name");
   }
-
   const name = typeAnnotation.typeName.name;
-
   if (name === 'Readonly') {
     return {
       argumentProps: typeAnnotation.typeParameters.params[0].members,
@@ -135,7 +123,6 @@ function findEventArgumentsAndType(
       typeAnnotation.typeParameters.params.length > 1
         ? typeAnnotation.typeParameters.params[1].literal.value
         : null;
-
     if (typeAnnotation.typeParameters.params[0].type === 'TSNullKeyword') {
       return {
         argumentProps: [],
@@ -143,7 +130,6 @@ function findEventArgumentsAndType(
         paperTopLevelNameDeprecated,
       };
     }
-
     return findEventArgumentsAndType(
       typeAnnotation.typeParameters.params[0],
       types,
@@ -165,26 +151,24 @@ function findEventArgumentsAndType(
     };
   }
 }
-
 function buildPropertiesForEvent(property) {
   const name = property.key.name;
   const optional = property.optional || false;
   let typeAnnotation = property.typeAnnotation.typeAnnotation;
   return getPropertyType(name, optional, typeAnnotation);
 }
-
 function getEventArgument(argumentProps, name) {
   return {
     type: 'ObjectTypeAnnotation',
     properties: argumentProps.map(buildPropertiesForEvent),
   };
 }
-
 function buildEventSchema(types, property) {
   const name = property.key.name;
   let optional = property.optional || false;
-  let typeAnnotation = property.typeAnnotation.typeAnnotation; // Check for T | null | void
+  let typeAnnotation = property.typeAnnotation.typeAnnotation;
 
+  // Check for T | null | void
   if (
     typeAnnotation.type === 'TSUnionType' &&
     typeAnnotation.types.some(
@@ -196,7 +180,6 @@ function buildEventSchema(types, property) {
     )[0];
     optional = true;
   }
-
   if (
     typeAnnotation.type !== 'TSTypeReference' ||
     (typeAnnotation.typeName.name !== 'BubblingEventHandler' &&
@@ -204,7 +187,6 @@ function buildEventSchema(types, property) {
   ) {
     return null;
   }
-
   const _findEventArgumentsAn = findEventArgumentsAndType(
       typeAnnotation,
       types,
@@ -213,7 +195,6 @@ function buildEventSchema(types, property) {
     bubblingType = _findEventArgumentsAn.bubblingType,
     paperTopLevelNameDeprecated =
       _findEventArgumentsAn.paperTopLevelNameDeprecated;
-
   if (bubblingType && argumentProps) {
     if (paperTopLevelNameDeprecated != null) {
       return {
@@ -227,7 +208,6 @@ function buildEventSchema(types, property) {
         },
       };
     }
-
     return {
       name,
       optional,
@@ -238,15 +218,15 @@ function buildEventSchema(types, property) {
       },
     };
   }
-
   if (argumentProps === null) {
     throw new Error(`Unable to determine event arguments for "${name}"`);
   }
-
   if (bubblingType === null) {
     throw new Error(`Unable to determine event arguments for "${name}"`);
   }
-} // $FlowFixMe[unclear-type] TODO(T108222691): Use flow-types for @babel/parser
+}
+
+// $FlowFixMe[unclear-type] TODO(T108222691): Use flow-types for @babel/parser
 
 function getEvents(eventTypeAST, types) {
   return eventTypeAST
@@ -254,7 +234,6 @@ function getEvents(eventTypeAST, types) {
     .map(property => buildEventSchema(types, property))
     .filter(Boolean);
 }
-
 module.exports = {
   getEvents,
 };

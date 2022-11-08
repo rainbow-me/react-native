@@ -8,6 +8,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function _toArray(arr) {
@@ -18,13 +19,11 @@ function _toArray(arr) {
     _nonIterableRest()
   );
 }
-
 function _nonIterableRest() {
   throw new TypeError(
     'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.',
   );
 }
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -34,13 +33,11 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
     return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-
 function _iterableToArray(iter) {
   if (
     (typeof Symbol !== 'undefined' && iter[Symbol.iterator] != null) ||
@@ -48,15 +45,11 @@ function _iterableToArray(iter) {
   )
     return Array.from(iter);
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 const parseFiles = require('./parser.js');
-
 const _process$argv$slice = process.argv.slice(2),
   _process$argv$slice2 = _toArray(_process$argv$slice),
   fileList = _process$argv$slice2.slice(0);
-
 parseFiles(fileList);

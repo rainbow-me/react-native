@@ -7,13 +7,12 @@
  *
  * @format
  */
+
 'use strict';
 
 const invariant = require('invariant');
-
 const _require = require('../errors'),
   ParserError = _require.ParserError;
-
 class MisnamedModuleTypeScriptInterfaceParserError extends ParserError {
   constructor(hasteModuleName, id) {
     super(
@@ -23,7 +22,6 @@ class MisnamedModuleTypeScriptInterfaceParserError extends ParserError {
     );
   }
 }
-
 class ModuleTypeScriptInterfaceNotFoundParserError extends ParserError {
   constructor(hasteModuleName, ast) {
     super(
@@ -33,14 +31,11 @@ class ModuleTypeScriptInterfaceNotFoundParserError extends ParserError {
     );
   }
 }
-
 class MoreThanOneModuleTypeScriptInterfaceParserError extends ParserError {
   constructor(hasteModuleName, flowModuleInterfaces, names) {
     const finalName = names[names.length - 1];
     const allButLastName = names.slice(0, -1);
-
     const quote = x => `'${x}'`;
-
     const nameStr =
       allButLastName.map(quote).join(', ') + ', and ' + quote(finalName);
     super(
@@ -50,7 +45,6 @@ class MoreThanOneModuleTypeScriptInterfaceParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedModulePropertyParserError extends ParserError {
   constructor(
     hasteModuleName,
@@ -65,7 +59,6 @@ class UnsupportedModulePropertyParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedTypeScriptTypeAnnotationParserError extends ParserError {
   constructor(hasteModuleName, typeAnnotation) {
     super(
@@ -76,7 +69,6 @@ class UnsupportedTypeScriptTypeAnnotationParserError extends ParserError {
     this.typeAnnotationType = typeAnnotation.type;
   }
 }
-
 class UnsupportedTypeScriptGenericParserError extends ParserError {
   constructor(hasteModuleName, genericTypeAnnotation) {
     const genericName = genericTypeAnnotation.typeName.name;
@@ -88,7 +80,6 @@ class UnsupportedTypeScriptGenericParserError extends ParserError {
     this.genericName = genericName;
   }
 }
-
 class IncorrectlyParameterizedTypeScriptGenericParserError extends ParserError {
   constructor(hasteModuleName, genericTypeAnnotation) {
     if (genericTypeAnnotation.typeParameters == null) {
@@ -99,7 +90,6 @@ class IncorrectlyParameterizedTypeScriptGenericParserError extends ParserError {
       );
       return;
     }
-
     if (
       genericTypeAnnotation.typeParameters.type ===
         'TypeParameterInstantiation' &&
@@ -112,13 +102,13 @@ class IncorrectlyParameterizedTypeScriptGenericParserError extends ParserError {
       );
       return;
     }
-
     invariant(
       false,
       "Couldn't create IncorrectlyParameterizedFlowGenericParserError",
     );
   }
 }
+
 /**
  * Array parsing errors
  */
@@ -137,6 +127,7 @@ class UnsupportedArrayElementTypeAnnotationParserError extends ParserError {
     );
   }
 }
+
 /**
  * Object parsing errors
  */
@@ -147,7 +138,6 @@ class UnsupportedObjectPropertyTypeAnnotationParserError extends ParserError {
     super(hasteModuleName, propertyAST, message);
   }
 }
-
 class UnsupportedObjectPropertyValueTypeAnnotationParserError extends ParserError {
   constructor(
     hasteModuleName,
@@ -162,6 +152,7 @@ class UnsupportedObjectPropertyValueTypeAnnotationParserError extends ParserErro
     );
   }
 }
+
 /**
  * Function parsing errors
  */
@@ -175,7 +166,6 @@ class UnnamedFunctionParamParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedFunctionParamTypeAnnotationParserError extends ParserError {
   constructor(
     hasteModuleName,
@@ -190,7 +180,6 @@ class UnsupportedFunctionParamTypeAnnotationParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedFunctionReturnTypeAnnotationParserError extends ParserError {
   constructor(hasteModuleName, flowReturnTypeAnnotation, invalidReturnType) {
     super(
@@ -200,7 +189,6 @@ class UnsupportedFunctionReturnTypeAnnotationParserError extends ParserError {
     );
   }
 }
-
 class UnusedModuleTypeScriptInterfaceParserError extends ParserError {
   constructor(hasteModuleName, flowInterface) {
     super(
@@ -210,7 +198,6 @@ class UnusedModuleTypeScriptInterfaceParserError extends ParserError {
     );
   }
 }
-
 class MoreThanOneModuleRegistryCallsParserError extends ParserError {
   constructor(hasteModuleName, flowCallExpressions, numCalls) {
     super(
@@ -220,7 +207,6 @@ class MoreThanOneModuleRegistryCallsParserError extends ParserError {
     );
   }
 }
-
 class UntypedModuleRegistryCallParserError extends ParserError {
   constructor(hasteModuleName, flowCallExpression, methodName, moduleName) {
     super(
@@ -230,7 +216,6 @@ class UntypedModuleRegistryCallParserError extends ParserError {
     );
   }
 }
-
 class IncorrectModuleRegistryCallTypeParameterParserError extends ParserError {
   constructor(hasteModuleName, flowTypeArguments, methodName, moduleName) {
     super(
@@ -240,7 +225,6 @@ class IncorrectModuleRegistryCallTypeParameterParserError extends ParserError {
     );
   }
 }
-
 class IncorrectModuleRegistryCallArityParserError extends ParserError {
   constructor(hasteModuleName, flowCallExpression, methodName, incorrectArity) {
     super(
@@ -250,7 +234,6 @@ class IncorrectModuleRegistryCallArityParserError extends ParserError {
     );
   }
 }
-
 class IncorrectModuleRegistryCallArgumentTypeParserError extends ParserError {
   constructor(hasteModuleName, flowArgument, methodName, type) {
     const a = /[aeiouy]/.test(type.toLowerCase()) ? 'an' : 'a';
@@ -261,7 +244,6 @@ class IncorrectModuleRegistryCallArgumentTypeParserError extends ParserError {
     );
   }
 }
-
 module.exports = {
   IncorrectlyParameterizedTypeScriptGenericParserError,
   MisnamedModuleTypeScriptInterfaceParserError,

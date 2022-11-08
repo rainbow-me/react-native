@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 class ParserError extends Error {
@@ -14,14 +15,15 @@ class ParserError extends Error {
     super(`Module ${hasteModuleName}: ${message}`);
     this.nodes = Array.isArray(astNodeOrNodes)
       ? astNodeOrNodes
-      : [astNodeOrNodes]; // assign the error class name in your custom error (as a shortcut)
+      : [astNodeOrNodes];
 
-    this.name = this.constructor.name; // capturing the stack trace keeps the reference to your error class
+    // assign the error class name in your custom error (as a shortcut)
+    this.name = this.constructor.name;
 
+    // capturing the stack trace keeps the reference to your error class
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
 module.exports = {
   ParserError,
 };

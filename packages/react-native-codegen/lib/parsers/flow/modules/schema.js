@@ -7,6 +7,7 @@
  * @format
  *
  */
+
 'use strict';
 
 function wrapModuleSchema(nativeModuleSchema, hasteModuleName) {
@@ -16,7 +17,6 @@ function wrapModuleSchema(nativeModuleSchema, hasteModuleName) {
     },
   };
 }
-
 module.exports = {
   wrapModuleSchema,
 };

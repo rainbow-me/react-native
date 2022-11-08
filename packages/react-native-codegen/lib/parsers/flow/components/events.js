@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function getPropertyType(name, optional, typeAnnotation) {
@@ -14,7 +15,6 @@ function getPropertyType(name, optional, typeAnnotation) {
     typeAnnotation.type === 'GenericTypeAnnotation'
       ? typeAnnotation.id.name
       : typeAnnotation.type;
-
   switch (type) {
     case 'BooleanTypeAnnotation':
       return {
@@ -24,7 +24,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'BooleanTypeAnnotation',
         },
       };
-
     case 'StringTypeAnnotation':
       return {
         name,
@@ -33,7 +32,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'StringTypeAnnotation',
         },
       };
-
     case 'Int32':
       return {
         name,
@@ -42,7 +40,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'Int32TypeAnnotation',
         },
       };
-
     case 'Double':
       return {
         name,
@@ -51,7 +48,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'DoubleTypeAnnotation',
         },
       };
-
     case 'Float':
       return {
         name,
@@ -60,14 +56,12 @@ function getPropertyType(name, optional, typeAnnotation) {
           type: 'FloatTypeAnnotation',
         },
       };
-
     case '$ReadOnly':
       return getPropertyType(
         name,
         optional,
         typeAnnotation.typeParameters.params[0],
       );
-
     case 'ObjectTypeAnnotation':
       return {
         name,
@@ -77,7 +71,6 @@ function getPropertyType(name, optional, typeAnnotation) {
           properties: typeAnnotation.properties.map(buildPropertiesForEvent),
         },
       };
-
     case 'UnionTypeAnnotation':
       return {
         name,
@@ -87,13 +80,11 @@ function getPropertyType(name, optional, typeAnnotation) {
           options: typeAnnotation.types.map(option => option.value),
         },
       };
-
     default:
       type;
       throw new Error(`Unable to determine event type for "${name}": ${type}`);
   }
 }
-
 function findEventArgumentsAndType(
   typeAnnotation,
   types,
@@ -103,9 +94,7 @@ function findEventArgumentsAndType(
   if (!typeAnnotation.id) {
     throw new Error("typeAnnotation of event doesn't have a name");
   }
-
   const name = typeAnnotation.id.name;
-
   if (name === '$ReadOnly') {
     return {
       argumentProps: typeAnnotation.typeParameters.params[0].properties,
@@ -118,7 +107,6 @@ function findEventArgumentsAndType(
       typeAnnotation.typeParameters.params.length > 1
         ? typeAnnotation.typeParameters.params[1].value
         : null;
-
     if (
       typeAnnotation.typeParameters.params[0].type ===
       'NullLiteralTypeAnnotation'
@@ -129,7 +117,6 @@ function findEventArgumentsAndType(
         paperTopLevelNameDeprecated,
       };
     }
-
     return findEventArgumentsAndType(
       typeAnnotation.typeParameters.params[0],
       types,
@@ -151,7 +138,6 @@ function findEventArgumentsAndType(
     };
   }
 }
-
 function buildPropertiesForEvent(property) {
   const name = property.key.name;
   const optional =
@@ -162,14 +148,12 @@ function buildPropertiesForEvent(property) {
       : property.value;
   return getPropertyType(name, optional, typeAnnotation);
 }
-
 function getEventArgument(argumentProps, name) {
   return {
     type: 'ObjectTypeAnnotation',
     properties: argumentProps.map(buildPropertiesForEvent),
   };
 }
-
 function buildEventSchema(types, property) {
   const name = property.key.name;
   const optional =
@@ -178,7 +162,6 @@ function buildEventSchema(types, property) {
     property.value.type === 'NullableTypeAnnotation'
       ? property.value.typeAnnotation
       : property.value;
-
   if (
     typeAnnotation.type !== 'GenericTypeAnnotation' ||
     (typeAnnotation.id.name !== 'BubblingEventHandler' &&
@@ -186,7 +169,6 @@ function buildEventSchema(types, property) {
   ) {
     return null;
   }
-
   const _findEventArgumentsAn = findEventArgumentsAndType(
       typeAnnotation,
       types,
@@ -195,7 +177,6 @@ function buildEventSchema(types, property) {
     bubblingType = _findEventArgumentsAn.bubblingType,
     paperTopLevelNameDeprecated =
       _findEventArgumentsAn.paperTopLevelNameDeprecated;
-
   if (bubblingType && argumentProps) {
     if (paperTopLevelNameDeprecated != null) {
       return {
@@ -209,7 +190,6 @@ function buildEventSchema(types, property) {
         },
       };
     }
-
     return {
       name,
       optional,
@@ -220,15 +200,15 @@ function buildEventSchema(types, property) {
       },
     };
   }
-
   if (argumentProps === null) {
     throw new Error(`Unable to determine event arguments for "${name}"`);
   }
-
   if (bubblingType === null) {
     throw new Error(`Unable to determine event arguments for "${name}"`);
   }
-} // $FlowFixMe[unclear-type] there's no flowtype for ASTs
+}
+
+// $FlowFixMe[unclear-type] there's no flowtype for ASTs
 
 function getEvents(eventTypeAST, types) {
   return eventTypeAST
@@ -236,7 +216,6 @@ function getEvents(eventTypeAST, types) {
     .map(property => buildEventSchema(types, property))
     .filter(Boolean);
 }
-
 module.exports = {
   getEvents,
 };

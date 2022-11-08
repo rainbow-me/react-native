@@ -7,11 +7,11 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('./Utils'),
   getModules = _require.getModules;
-
 const ModuleClassDeclarationTemplate = ({hasteModuleName}) => {
   return `/**
  * JNI C++ class for module '${hasteModuleName}'
@@ -22,7 +22,6 @@ public:
 };
 `;
 };
-
 const HeaderFileTemplate = ({modules, libraryName}) => {
   return `
 /**
@@ -50,8 +49,9 @@ std::shared_ptr<TurboModule> ${libraryName}_ModuleProvider(const std::string mod
 } // namespace react
 } // namespace facebook
 `;
-}; // Note: this Android.mk template includes dependencies for both NativeModule and components.
+};
 
+// Note: this Android.mk template includes dependencies for both NativeModule and components.
 const AndroidMkTemplate = ({libraryName}) => {
   return `# Copyright (c) Meta Platforms, Inc. and affiliates.
 #
@@ -67,6 +67,7 @@ LOCAL_MODULE := react_codegen_${libraryName}
 LOCAL_C_INCLUDES := $(LOCAL_PATH)
 
 LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.cpp) $(wildcard $(LOCAL_PATH)/react/renderer/components/${libraryName}/*.cpp)
+LOCAL_SRC_FILES := $(subst $(LOCAL_PATH)/,,$(LOCAL_SRC_FILES))
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) $(LOCAL_PATH)/react/renderer/components/${libraryName}
 
@@ -80,7 +81,6 @@ LOCAL_CFLAGS += -fexceptions -frtti -std=c++17 -Wall
 include $(BUILD_SHARED_LIBRARY)
 `;
 };
-
 module.exports = {
   generate(libraryName, schema, packageName, assumeNonnull = false) {
     const nativeModules = getModules(schema);

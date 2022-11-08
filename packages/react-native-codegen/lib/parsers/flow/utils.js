@@ -7,10 +7,12 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('./errors'),
   ParserError = _require.ParserError;
+
 /**
  * This FlowFixMe is supposed to refer to an InterfaceDeclaration or TypeAlias
  * declaration type. Unfortunately, we don't have those types, because flow-parser
@@ -35,14 +37,18 @@ function getTypes(ast) {
     ) {
       types[node.id.name] = node;
     }
-
     return types;
   }, {});
-} // $FlowFixMe[unclear-type] there's no flowtype for ASTs
+}
+
+// $FlowFixMe[unclear-type] there's no flowtype for ASTs
 
 const invariant = require('invariant');
-
-function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T71778680): This is an Flow TypeAnnotation. Flow-type this
+function resolveTypeAnnotation(
+  // TODO(T71778680): This is an Flow TypeAnnotation. Flow-type this
+  typeAnnotation,
+  types,
+) {
   invariant(
     typeAnnotation != null,
     'resolveTypeAnnotation(): typeAnnotation cannot be null',
@@ -52,7 +58,6 @@ function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T71778680): This
   let typeAliasResolutionStatus = {
     successful: false,
   };
-
   for (;;) {
     if (node.type === 'NullableTypeAnnotation') {
       nullable = true;
@@ -63,11 +68,9 @@ function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T71778680): This
         aliasName: node.id.name,
       };
       const resolvedTypeAnnotation = types[node.id.name];
-
       if (resolvedTypeAnnotation == null) {
         break;
       }
-
       invariant(
         resolvedTypeAnnotation.type === 'TypeAlias',
         `GenericTypeAnnotation '${node.id.name}' must resolve to a TypeAlias. Instead, it resolved to a '${resolvedTypeAnnotation.type}'`,
@@ -77,25 +80,20 @@ function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T71778680): This
       break;
     }
   }
-
   return {
     nullable: nullable,
     typeAnnotation: node,
     typeAliasResolutionStatus,
   };
 }
-
 function getValueFromTypes(value, types) {
   if (value.type === 'GenericTypeAnnotation' && types[value.id.name]) {
     return getValueFromTypes(types[value.id.name].right, types);
   }
-
   return value;
 }
-
 function createParserErrorCapturer() {
   const errors = [];
-
   function guard(fn) {
     try {
       return fn();
@@ -103,25 +101,21 @@ function createParserErrorCapturer() {
       if (!(error instanceof ParserError)) {
         throw error;
       }
-
       errors.push(error);
       return null;
     }
   }
-
   return [errors, guard];
-} // TODO(T71778680): Flow-type ASTNodes.
+}
 
+// TODO(T71778680): Flow-type ASTNodes.
 function visit(astNode, visitor) {
   const queue = [astNode];
-
   while (queue.length !== 0) {
     let item = queue.shift();
-
     if (!(typeof item === 'object' && item != null)) {
       continue;
     }
-
     if (
       typeof item.type === 'string' &&
       typeof visitor[item.type] === 'function'
@@ -134,21 +128,18 @@ function visit(astNode, visitor) {
       queue.push(...Object.values(item));
     }
   }
-} // TODO(T71778680): Flow-type ASTNodes.
+}
 
+// TODO(T71778680): Flow-type ASTNodes.
 function isModuleRegistryCall(node) {
   if (node.type !== 'CallExpression') {
     return false;
   }
-
   const callExpression = node;
-
   if (callExpression.callee.type !== 'MemberExpression') {
     return false;
   }
-
   const memberExpression = callExpression.callee;
-
   if (
     !(
       memberExpression.object.type === 'Identifier' &&
@@ -157,7 +148,6 @@ function isModuleRegistryCall(node) {
   ) {
     return false;
   }
-
   if (
     !(
       memberExpression.property.type === 'Identifier' &&
@@ -167,14 +157,11 @@ function isModuleRegistryCall(node) {
   ) {
     return false;
   }
-
   if (memberExpression.computed) {
     return false;
   }
-
   return true;
 }
-
 module.exports = {
   getValueFromTypes,
   resolveTypeAnnotation,

@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 const NO_PROPS_NO_EVENTS = {

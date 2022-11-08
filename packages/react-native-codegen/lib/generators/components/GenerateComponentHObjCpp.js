@@ -7,34 +7,29 @@
  *
  * @format
  */
+
 'use strict';
 
 function getOrdinalNumber(num) {
   switch (num) {
     case 1:
       return '1st';
-
     case 2:
       return '2nd';
-
     case 3:
       return '3rd';
   }
-
   if (num <= 20) {
     return `${num}th`;
   }
-
   return 'unknown';
 }
-
 const ProtocolTemplate = ({componentName, methods}) =>
   `
 @protocol RCT${componentName}ViewProtocol <NSObject>
 ${methods}
 @end
 `.trim();
-
 const CommandHandlerIfCaseConvertArgTemplate = ({
   componentName,
   expectedKind,
@@ -52,7 +47,6 @@ const CommandHandlerIfCaseConvertArgTemplate = ({
 #endif
   ${argConversion}
 `.trim();
-
 const CommandHandlerIfCaseTemplate = ({
   componentName,
   commandName,
@@ -75,7 +69,6 @@ if ([commandName isEqualToString:@"${commandName}"]) {
   return;
 }
 `.trim();
-
 const CommandHandlerTemplate = ({componentName, ifCases}) =>
   `
 RCT_EXTERN inline void RCT${componentName}HandleCommand(
@@ -90,7 +83,6 @@ RCT_EXTERN inline void RCT${componentName}HandleCommand(
 #endif
 }
 `.trim();
-
 const FileTemplate = ({componentContent}) =>
   `
 /**
@@ -112,147 +104,110 @@ ${componentContent}
 
 NS_ASSUME_NONNULL_END
 `.trim();
-
 function getObjCParamType(param) {
   const typeAnnotation = param.typeAnnotation;
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return 'double';
-
         default:
           typeAnnotation.name;
           throw new Error(`Receieved invalid type: ${typeAnnotation.name}`);
       }
-
     case 'BooleanTypeAnnotation':
       return 'BOOL';
-
     case 'DoubleTypeAnnotation':
       return 'double';
-
     case 'FloatTypeAnnotation':
       return 'float';
-
     case 'Int32TypeAnnotation':
       return 'NSInteger';
-
     case 'StringTypeAnnotation':
       return 'NSString *';
-
     default:
       typeAnnotation.type;
       throw new Error('Received invalid param type annotation');
   }
 }
-
 function getObjCExpectedKindParamType(param) {
   const typeAnnotation = param.typeAnnotation;
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return '[NSNumber class]';
-
         default:
           typeAnnotation.name;
           throw new Error(`Receieved invalid type: ${typeAnnotation.name}`);
       }
-
     case 'BooleanTypeAnnotation':
       return '[NSNumber class]';
-
     case 'DoubleTypeAnnotation':
       return '[NSNumber class]';
-
     case 'FloatTypeAnnotation':
       return '[NSNumber class]';
-
     case 'Int32TypeAnnotation':
       return '[NSNumber class]';
-
     case 'StringTypeAnnotation':
       return '[NSString class]';
-
     default:
       typeAnnotation.type;
       throw new Error('Received invalid param type annotation');
   }
 }
-
 function getReadableExpectedKindParamType(param) {
   const typeAnnotation = param.typeAnnotation;
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return 'double';
-
         default:
           typeAnnotation.name;
           throw new Error(`Receieved invalid type: ${typeAnnotation.name}`);
       }
-
     case 'BooleanTypeAnnotation':
       return 'boolean';
-
     case 'DoubleTypeAnnotation':
       return 'double';
-
     case 'FloatTypeAnnotation':
       return 'float';
-
     case 'Int32TypeAnnotation':
       return 'number';
-
     case 'StringTypeAnnotation':
       return 'string';
-
     default:
       typeAnnotation.type;
       throw new Error('Received invalid param type annotation');
   }
 }
-
 function getObjCRightHandAssignmentParamType(param, index) {
   const typeAnnotation = param.typeAnnotation;
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return `[(NSNumber *)arg${index} doubleValue]`;
-
         default:
           typeAnnotation.name;
           throw new Error(`Receieved invalid type: ${typeAnnotation.name}`);
       }
-
     case 'BooleanTypeAnnotation':
       return `[(NSNumber *)arg${index} boolValue]`;
-
     case 'DoubleTypeAnnotation':
       return `[(NSNumber *)arg${index} doubleValue]`;
-
     case 'FloatTypeAnnotation':
       return `[(NSNumber *)arg${index} floatValue]`;
-
     case 'Int32TypeAnnotation':
       return `[(NSNumber *)arg${index} intValue]`;
-
     case 'StringTypeAnnotation':
       return `(NSString *)arg${index}`;
-
     default:
       typeAnnotation.type;
       throw new Error('Received invalid param type annotation');
   }
 }
-
 function generateProtocol(component, componentName) {
   const methods = component.commands
     .map(command => {
@@ -277,7 +232,6 @@ function generateProtocol(component, componentName) {
     methods,
   });
 }
-
 function generateConvertAndValidateParam(param, index, componentName) {
   const leftSideType = getObjCParamType(param);
   const expectedKind = getObjCExpectedKindParamType(param);
@@ -294,7 +248,6 @@ function generateConvertAndValidateParam(param, index, componentName) {
     expectedKindString,
   });
 }
-
 function generateCommandIfCase(command, componentName) {
   const params = command.typeAnnotation.params;
   const convertArgs = params
@@ -320,12 +273,10 @@ function generateCommandIfCase(command, componentName) {
     commandCall,
   });
 }
-
 function generateCommandHandler(component, componentName) {
   if (component.commands.length === 0) {
     return null;
   }
-
   const ifCases = component.commands
     .map(command => generateCommandIfCase(command, componentName))
     .join('\n\n');
@@ -334,24 +285,20 @@ function generateCommandHandler(component, componentName) {
     ifCases,
   });
 }
-
 module.exports = {
   generate(libraryName, schema, packageName, assumeNonnull = false) {
     const fileName = 'RCTComponentViewHelpers.h';
     const componentContent = Object.keys(schema.modules)
       .map(moduleName => {
         const module = schema.modules[moduleName];
-
         if (module.type !== 'Component') {
           return;
         }
-
-        const components = module.components; // No components in this module
-
+        const components = module.components;
+        // No components in this module
         if (components == null) {
           return null;
         }
-
         return Object.keys(components)
           .filter(componentName => {
             const component = components[componentName];

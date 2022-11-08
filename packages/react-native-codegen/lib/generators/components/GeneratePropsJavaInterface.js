@@ -7,12 +7,15 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('./JavaHelpers'),
   getImports = _require.getImports,
   toSafeJavaString = _require.toSafeJavaString,
-  getInterfaceJavaClassName = _require.getInterfaceJavaClassName; // File path -> contents
+  getInterfaceJavaClassName = _require.getInterfaceJavaClassName;
+
+// File path -> contents
 
 const FileTemplate = ({
   packageName,
@@ -37,14 +40,11 @@ public interface ${className}<T extends ${extendClasses}> {
   ${methods}
 }
 `;
-
 function addNullable(imports) {
   imports.add('import androidx.annotation.Nullable;');
 }
-
 function getJavaValueForProp(prop, imports) {
   const typeAnnotation = prop.typeAnnotation;
-
   switch (typeAnnotation.type) {
     case 'BooleanTypeAnnotation':
       if (typeAnnotation.default === null) {
@@ -53,17 +53,13 @@ function getJavaValueForProp(prop, imports) {
       } else {
         return 'boolean value';
       }
-
     case 'StringTypeAnnotation':
       addNullable(imports);
       return '@Nullable String value';
-
     case 'Int32TypeAnnotation':
       return 'int value';
-
     case 'DoubleTypeAnnotation':
       return 'double value';
-
     case 'FloatTypeAnnotation':
       if (typeAnnotation.default === null) {
         addNullable(imports);
@@ -71,59 +67,47 @@ function getJavaValueForProp(prop, imports) {
       } else {
         return 'float value';
       }
-
     case 'ReservedPropTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'ColorPrimitive':
           addNullable(imports);
           return '@Nullable Integer value';
-
         case 'ImageSourcePrimitive':
           addNullable(imports);
           return '@Nullable ReadableMap value';
-
         case 'PointPrimitive':
           addNullable(imports);
           return '@Nullable ReadableMap value';
-
         case 'EdgeInsetsPrimitive':
           addNullable(imports);
           return '@Nullable ReadableMap value';
-
         default:
           typeAnnotation.name;
           throw new Error('Received unknown ReservedPropTypeAnnotation');
       }
-
     case 'ArrayTypeAnnotation': {
       addNullable(imports);
       return '@Nullable ReadableArray value';
     }
-
     case 'ObjectTypeAnnotation': {
       addNullable(imports);
       return '@Nullable ReadableMap value';
     }
-
     case 'StringEnumTypeAnnotation':
       addNullable(imports);
       return '@Nullable String value';
-
     case 'Int32EnumTypeAnnotation':
       addNullable(imports);
       return '@Nullable Integer value';
-
     default:
       typeAnnotation;
       throw new Error('Received invalid typeAnnotation');
   }
 }
-
 function generatePropsString(component, imports) {
   if (component.props.length === 0) {
     return '// No props';
   }
-
   return component.props
     .map(prop => {
       return `void set${toSafeJavaString(
@@ -132,42 +116,32 @@ function generatePropsString(component, imports) {
     })
     .join('\n' + '  ');
 }
-
 function getCommandArgJavaType(param) {
   const typeAnnotation = param.typeAnnotation;
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return 'double';
-
         default:
           typeAnnotation.name;
           throw new Error(`Receieved invalid type: ${typeAnnotation.name}`);
       }
-
     case 'BooleanTypeAnnotation':
       return 'boolean';
-
     case 'DoubleTypeAnnotation':
       return 'double';
-
     case 'FloatTypeAnnotation':
       return 'float';
-
     case 'Int32TypeAnnotation':
       return 'int';
-
     case 'StringTypeAnnotation':
       return 'String';
-
     default:
       typeAnnotation.type;
       throw new Error('Receieved invalid typeAnnotation');
   }
 }
-
 function getCommandArguments(command, componentName) {
   return [
     'T view',
@@ -177,7 +151,6 @@ function getCommandArguments(command, componentName) {
     }),
   ].join(', ');
 }
-
 function generateCommandsString(component, componentName) {
   return component.commands
     .map(command => {
@@ -189,7 +162,6 @@ function generateCommandsString(component, componentName) {
     })
     .join('\n' + '  ');
 }
-
 function getClassExtendString(component) {
   const extendString = component.extendsProps
     .map(extendProps => {
@@ -198,12 +170,10 @@ function getClassExtendString(component) {
           switch (extendProps.knownTypeName) {
             case 'ReactNativeCoreViewProps':
               return 'View';
-
             default:
               extendProps.knownTypeName;
               throw new Error('Invalid knownTypeName');
           }
-
         default:
           extendProps.type;
           throw new Error('Invalid extended type');
@@ -212,7 +182,6 @@ function getClassExtendString(component) {
     .join('');
   return extendString;
 }
-
 module.exports = {
   generate(libraryName, schema, packageName, assumeNonnull = false) {
     // TODO: This doesn't support custom package name yet.
@@ -221,17 +190,15 @@ module.exports = {
     const files = new Map();
     Object.keys(schema.modules).forEach(moduleName => {
       const module = schema.modules[moduleName];
-
       if (module.type !== 'Component') {
         return;
       }
+      const components = module.components;
 
-      const components = module.components; // No components in this module
-
+      // No components in this module
       if (components == null) {
         return;
       }
-
       return Object.keys(components)
         .filter(componentName => {
           const component = components[componentName];

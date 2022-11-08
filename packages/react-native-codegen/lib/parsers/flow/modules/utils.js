@@ -7,27 +7,24 @@
  *
  * @format
  */
+
 'use strict';
 
 function unwrapNullable(x) {
   if (x.type === 'NullableTypeAnnotation') {
     return [x.typeAnnotation, true];
   }
-
   return [x, false];
 }
-
 function wrapNullable(nullable, typeAnnotation) {
   if (!nullable) {
     return typeAnnotation;
   }
-
   return {
     type: 'NullableTypeAnnotation',
     typeAnnotation,
   };
 }
-
 module.exports = {
   unwrapNullable,
   wrapNullable,

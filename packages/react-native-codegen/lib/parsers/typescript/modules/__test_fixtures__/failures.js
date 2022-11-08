@@ -8,6 +8,7 @@
  * @format
  * @lint-ignore-every LICENSELINT
  */
+
 const NATIVE_MODULES_WITH_ARRAY_WITH_NO_TYPE_FOR_CONTENT = `
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.

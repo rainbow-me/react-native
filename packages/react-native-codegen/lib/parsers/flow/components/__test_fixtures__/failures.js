@@ -8,6 +8,7 @@
  * @format
  * @lint-ignore-every LICENSELINT
  */
+
 'use strict';
 
 const COMMANDS_DEFINED_INLINE = `

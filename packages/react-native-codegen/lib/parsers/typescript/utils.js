@@ -7,10 +7,12 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('./errors'),
   ParserError = _require.ParserError;
+
 /**
  * TODO(T108222691): Use flow-types for @babel/parser
  */
@@ -30,14 +32,18 @@ function getTypes(ast) {
     ) {
       types[node.id.name] = node;
     }
-
     return types;
   }, {});
-} // $FlowFixMe[unclear-type] Use flow-types for @babel/parser
+}
+
+// $FlowFixMe[unclear-type] Use flow-types for @babel/parser
 
 const invariant = require('invariant');
-
-function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T108222691): Use flow-types for @babel/parser
+function resolveTypeAnnotation(
+  // TODO(T108222691): Use flow-types for @babel/parser
+  typeAnnotation,
+  types,
+) {
   invariant(
     typeAnnotation != null,
     'resolveTypeAnnotation(): typeAnnotation cannot be null',
@@ -50,7 +56,6 @@ function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T108222691): Use
   let typeAliasResolutionStatus = {
     successful: false,
   };
-
   for (;;) {
     // Check for optional type in union e.g. T | null | void
     if (
@@ -69,11 +74,9 @@ function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T108222691): Use
         aliasName: node.typeName.name,
       };
       const resolvedTypeAnnotation = types[node.typeName.name];
-
       if (resolvedTypeAnnotation == null) {
         break;
       }
-
       invariant(
         resolvedTypeAnnotation.type === 'TSTypeAliasDeclaration',
         `GenericTypeAnnotation '${node.typeName.name}' must resolve to a TSTypeAliasDeclaration. Instead, it resolved to a '${resolvedTypeAnnotation.type}'`,
@@ -83,29 +86,23 @@ function resolveTypeAnnotation(typeAnnotation, types) { // TODO(T108222691): Use
       break;
     }
   }
-
   return {
     nullable: nullable,
     typeAnnotation: node,
     typeAliasResolutionStatus,
   };
 }
-
 function getValueFromTypes(value, types) {
   if (value.type === 'TSTypeReference' && types[value.typeName.name]) {
     return getValueFromTypes(types[value.typeName.name], types);
   }
-
   if (value.type === 'TSTypeAliasDeclaration') {
     return value.typeAnnotation;
   }
-
   return value;
 }
-
 function createParserErrorCapturer() {
   const errors = [];
-
   function guard(fn) {
     try {
       return fn();
@@ -113,25 +110,21 @@ function createParserErrorCapturer() {
       if (!(error instanceof ParserError)) {
         throw error;
       }
-
       errors.push(error);
       return null;
     }
   }
-
   return [errors, guard];
-} // TODO(T108222691): Use flow-types for @babel/parser
+}
 
+// TODO(T108222691): Use flow-types for @babel/parser
 function visit(astNode, visitor) {
   const queue = [astNode];
-
   while (queue.length !== 0) {
     let item = queue.shift();
-
     if (!(typeof item === 'object' && item != null)) {
       continue;
     }
-
     if (
       typeof item.type === 'string' &&
       typeof visitor[item.type] === 'function'
@@ -144,21 +137,18 @@ function visit(astNode, visitor) {
       queue.push(...Object.values(item));
     }
   }
-} // TODO(T108222691): Use flow-types for @babel/parser
+}
 
+// TODO(T108222691): Use flow-types for @babel/parser
 function isModuleRegistryCall(node) {
   if (node.type !== 'CallExpression') {
     return false;
   }
-
   const callExpression = node;
-
   if (callExpression.callee.type !== 'MemberExpression') {
     return false;
   }
-
   const memberExpression = callExpression.callee;
-
   if (
     !(
       memberExpression.object.type === 'Identifier' &&
@@ -167,7 +157,6 @@ function isModuleRegistryCall(node) {
   ) {
     return false;
   }
-
   if (
     !(
       memberExpression.property.type === 'Identifier' &&
@@ -177,14 +166,11 @@ function isModuleRegistryCall(node) {
   ) {
     return false;
   }
-
   if (memberExpression.computed) {
     return false;
   }
-
   return true;
 }
-
 module.exports = {
   getValueFromTypes,
   resolveTypeAnnotation,

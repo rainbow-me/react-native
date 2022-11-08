@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function _slicedToArray(arr, i) {
@@ -17,13 +18,11 @@ function _slicedToArray(arr, i) {
     _nonIterableRest()
   );
 }
-
 function _nonIterableRest() {
   throw new TypeError(
     'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.',
   );
 }
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -33,13 +32,11 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
     return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-
 function _iterableToArrayLimit(arr, i) {
   var _i =
     arr == null
@@ -68,21 +65,16 @@ function _iterableToArrayLimit(arr, i) {
   }
   return _arr;
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 const _require = require('../Utils'),
   getSafePropertyName = _require.getSafePropertyName,
   getNamespacedStructName = _require.getNamespacedStructName;
-
 const _require2 = require('../../../Utils'),
   capitalize = _require2.capitalize;
-
 const _require3 = require('../../../../parsers/flow/modules/utils'),
   unwrapNullable = _require3.unwrapNullable;
-
 const StructTemplate = ({
   hasteModuleName,
   structName,
@@ -114,7 +106,6 @@ const StructTemplate = ({
     };
   }
 }`;
-
 const MethodTemplate = ({
   hasteModuleName,
   structName,
@@ -127,7 +118,6 @@ ${properties}
 inline JS::${hasteModuleName}::${structName}::Builder::Builder(${structName} i) : _factory(^{
   return i.unsafeRawValue();
 }) {}`;
-
 function toObjCType(
   hasteModuleName,
   nullableTypeAnnotation,
@@ -137,57 +127,43 @@ function toObjCType(
     _unwrapNullable2 = _slicedToArray(_unwrapNullable, 2),
     typeAnnotation = _unwrapNullable2[0],
     nullable = _unwrapNullable2[1];
-
   const isRequired = !nullable && !isOptional;
-
   const wrapFollyOptional = type => {
     return isRequired ? type : `folly::Optional<${type}>`;
   };
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return wrapFollyOptional('double');
-
         default:
           typeAnnotation.name;
           throw new Error(`Unknown prop type, found: ${typeAnnotation.name}"`);
       }
-
     case 'StringTypeAnnotation':
       return 'NSString *';
-
     case 'NumberTypeAnnotation':
       return wrapFollyOptional('double');
-
     case 'FloatTypeAnnotation':
       return wrapFollyOptional('double');
-
     case 'Int32TypeAnnotation':
       return wrapFollyOptional('double');
-
     case 'DoubleTypeAnnotation':
       return wrapFollyOptional('double');
-
     case 'BooleanTypeAnnotation':
       return wrapFollyOptional('bool');
-
     case 'GenericObjectTypeAnnotation':
       return isRequired ? 'id<NSObject> ' : 'id<NSObject> _Nullable ';
-
     case 'ArrayTypeAnnotation':
       if (typeAnnotation.elementType == null) {
         return isRequired ? 'id<NSObject> ' : 'id<NSObject> _Nullable ';
       }
-
       return wrapFollyOptional(
         `std::vector<${toObjCType(
           hasteModuleName,
           typeAnnotation.elementType,
         )}>`,
       );
-
     case 'TypeAliasTypeAnnotation':
       const structName = capitalize(typeAnnotation.name);
       const namespacedStructName = getNamespacedStructName(
@@ -195,7 +171,6 @@ function toObjCType(
         structName,
       );
       return wrapFollyOptional(`${namespacedStructName}::Builder`);
-
     default:
       typeAnnotation.type;
       throw new Error(
@@ -203,7 +178,6 @@ function toObjCType(
       );
   }
 }
-
 function toObjCValue(
   hasteModuleName,
   nullableTypeAnnotation,
@@ -215,56 +189,42 @@ function toObjCValue(
     _unwrapNullable4 = _slicedToArray(_unwrapNullable3, 2),
     typeAnnotation = _unwrapNullable4[0],
     nullable = _unwrapNullable4[1];
-
   const isRequired = !nullable && !isOptional;
-
   function wrapPrimitive(type) {
     return !isRequired
       ? `${value}.hasValue() ? @((${type})${value}.value()) : nil`
       : `@(${value})`;
   }
-
   switch (typeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return wrapPrimitive('double');
-
         default:
           typeAnnotation.name;
           throw new Error(
             `Couldn't convert into ObjC type: ${typeAnnotation.type}"`,
           );
       }
-
     case 'StringTypeAnnotation':
       return value;
-
     case 'NumberTypeAnnotation':
       return wrapPrimitive('double');
-
     case 'FloatTypeAnnotation':
       return wrapPrimitive('double');
-
     case 'Int32TypeAnnotation':
       return wrapPrimitive('double');
-
     case 'DoubleTypeAnnotation':
       return wrapPrimitive('double');
-
     case 'BooleanTypeAnnotation':
       return wrapPrimitive('BOOL');
-
     case 'GenericObjectTypeAnnotation':
       return value;
-
     case 'ArrayTypeAnnotation':
       const elementType = typeAnnotation.elementType;
-
       if (elementType == null) {
         return value;
       }
-
       const localVarName = `el${'_'.repeat(depth + 1)}`;
       const elementObjCType = toObjCType(hasteModuleName, elementType);
       const elementObjCValue = toObjCValue(
@@ -273,22 +233,18 @@ function toObjCValue(
         localVarName,
         depth + 1,
       );
-
       const RCTConvertVecToArray = transformer => {
         return `RCTConvert${
           !isRequired ? 'Optional' : ''
         }VecToArray(${value}, ${transformer})`;
       };
-
       return RCTConvertVecToArray(
         `^id(${elementObjCType} ${localVarName}) { return ${elementObjCValue}; }`,
       );
-
     case 'TypeAliasTypeAnnotation':
       return !isRequired
         ? `${value}.hasValue() ? ${value}.value().buildUnsafeRawValue() : nil`
         : `${value}.buildUnsafeRawValue()`;
-
     default:
       typeAnnotation.type;
       throw new Error(
@@ -296,7 +252,6 @@ function toObjCValue(
       );
   }
 }
-
 function serializeConstantsStruct(hasteModuleName, struct) {
   const declaration = StructTemplate({
     hasteModuleName,
@@ -307,11 +262,9 @@ function serializeConstantsStruct(hasteModuleName, struct) {
           optional = property.optional;
         const safePropName = getSafePropertyName(property);
         const objCType = toObjCType(hasteModuleName, typeAnnotation, optional);
-
         if (!optional) {
           return `RCTRequired<${objCType}> ${safePropName};`;
         }
-
         const space = ' '.repeat(objCType.endsWith('*') ? 0 : 1);
         return `${objCType}${space}${safePropName};`;
       })
@@ -334,11 +287,9 @@ function serializeConstantsStruct(hasteModuleName, struct) {
           optional,
         );
         let varDecl = `auto ${safePropName} = i.${safePropName}`;
-
         if (!optional) {
           varDecl += '.get()';
         }
-
         const assignment = `d[@"${propName}"] = ` + objCValue;
         return `  ${varDecl};\n  ${assignment};`;
       })
@@ -349,7 +300,6 @@ function serializeConstantsStruct(hasteModuleName, struct) {
     methods,
   };
 }
-
 module.exports = {
   serializeConstantsStruct,
 };

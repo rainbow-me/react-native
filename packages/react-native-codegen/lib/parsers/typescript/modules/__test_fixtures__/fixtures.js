@@ -8,6 +8,7 @@
  * @format
  * @lint-ignore-every LICENSELINT
  */
+
 const EMPTY_NATIVE_MODULE = `
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.

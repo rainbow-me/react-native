@@ -8,6 +8,7 @@
  * @format
  * @lint-ignore-every LICENSELINT
  */
+
 'use strict';
 
 const EVENT_DEFINITION = `

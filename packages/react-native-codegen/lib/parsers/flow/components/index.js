@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function ownKeys(object, enumerableOnly) {
@@ -21,7 +22,6 @@ function ownKeys(object, enumerableOnly) {
   }
   return keys;
 }
-
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = null != arguments[i] ? arguments[i] : {};
@@ -44,7 +44,6 @@ function _objectSpread(target) {
   }
   return target;
 }
-
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -58,41 +57,34 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-
 const _require = require('./commands'),
   getCommands = _require.getCommands;
-
 const _require2 = require('./events'),
   getEvents = _require2.getEvents;
-
 const _require3 = require('./props'),
   getProps = _require3.getProps,
   getPropProperties = _require3.getPropProperties;
-
 const _require4 = require('./options'),
   getCommandOptions = _require4.getCommandOptions,
   getOptions = _require4.getOptions;
-
 const _require5 = require('./extends'),
   getExtendsProps = _require5.getExtendsProps,
   removeKnownExtends = _require5.removeKnownExtends;
-
 const _require6 = require('../utils'),
   getTypes = _require6.getTypes;
-
 function findComponentConfig(ast) {
   const foundConfigs = [];
   const defaultExports = ast.body.filter(
     node => node.type === 'ExportDefaultDeclaration',
   );
   defaultExports.forEach(statement => {
-    let declaration = statement.declaration; // codegenNativeComponent can be nested inside a cast
-    // expression so we need to go one level deeper
+    let declaration = statement.declaration;
 
+    // codegenNativeComponent can be nested inside a cast
+    // expression so we need to go one level deeper
     if (declaration.type === 'TypeCastExpression') {
       declaration = declaration.expression;
     }
-
     try {
       if (declaration.callee.name === 'codegenNativeComponent') {
         const typeArgumentParams = declaration.typeArguments.params;
@@ -100,26 +92,21 @@ function findComponentConfig(ast) {
         const nativeComponentType = {};
         nativeComponentType.propsTypeName = typeArgumentParams[0].id.name;
         nativeComponentType.componentName = funcArgumentParams[0].value;
-
         if (funcArgumentParams.length > 1) {
           nativeComponentType.optionsExpression = funcArgumentParams[1];
         }
-
         foundConfigs.push(nativeComponentType);
       }
     } catch (e) {
       // ignore
     }
   });
-
   if (foundConfigs.length === 0) {
     throw new Error('Could not find component config for native component');
   }
-
   if (foundConfigs.length > 1) {
     throw new Error('Only one component is supported per file');
   }
-
   const foundConfig = foundConfigs[0];
   const namedExports = ast.body.filter(
     node => node.type === 'ExportNamedDeclaration',
@@ -128,43 +115,37 @@ function findComponentConfig(ast) {
     .map(statement => {
       let callExpression;
       let calleeName;
-
       try {
         callExpression = statement.declaration.declarations[0].init;
         calleeName = callExpression.callee.name;
       } catch (e) {
         return;
       }
-
       if (calleeName !== 'codegenNativeCommands') {
         return;
-      } // const statement.declaration.declarations[0].init
+      }
 
+      // const statement.declaration.declarations[0].init
       if (callExpression.arguments.length !== 1) {
         throw new Error(
           'codegenNativeCommands must be passed options including the supported commands',
         );
       }
-
       const typeArgumentParam = callExpression.typeArguments.params[0];
-
       if (typeArgumentParam.type !== 'GenericTypeAnnotation') {
         throw new Error(
           "codegenNativeCommands doesn't support inline definitions. Specify a file local type alias",
         );
       }
-
       return {
         commandTypeName: typeArgumentParam.id.name,
         commandOptionsExpression: callExpression.arguments[0],
       };
     })
     .filter(Boolean);
-
   if (commandsTypeNames.length > 1) {
     throw new Error('codegenNativeCommands may only be called once in a file');
   }
-
   return _objectSpread(
     _objectSpread({}, foundConfig),
     {},
@@ -180,22 +161,17 @@ function findComponentConfig(ast) {
     },
   );
 }
-
 function getCommandProperties(commandTypeName, types, commandOptions) {
   if (commandTypeName == null) {
     return [];
   }
-
   const typeAlias = types[commandTypeName];
-
   if (typeAlias.type !== 'InterfaceDeclaration') {
     throw new Error(
       `The type argument for codegenNativeCommands must be an interface, received ${typeAlias.type}`,
     );
   }
-
   let properties;
-
   try {
     properties = typeAlias.body.properties;
   } catch (e) {
@@ -203,17 +179,14 @@ function getCommandProperties(commandTypeName, types, commandOptions) {
       `Failed to find type definition for "${commandTypeName}", please check that you have a valid codegen flow file`,
     );
   }
-
   const flowPropertyNames = properties
     .map(property => property && property.key && property.key.name)
     .filter(Boolean);
-
   if (commandOptions == null || commandOptions.supportedCommands == null) {
     throw new Error(
       'codegenNativeCommands must be given an options object with supportedCommands array',
     );
   }
-
   if (
     commandOptions.supportedCommands.length !== flowPropertyNames.length ||
     !commandOptions.supportedCommands.every(supportedCommand =>
@@ -226,10 +199,10 @@ function getCommandProperties(commandTypeName, types, commandOptions) {
       )}`,
     );
   }
-
   return properties;
-} // $FlowFixMe[signature-verification-failure] there's no flowtype for AST
+}
 
+// $FlowFixMe[signature-verification-failure] there's no flowtype for AST
 function buildComponentSchema(ast) {
   const _findComponentConfig = findComponentConfig(ast),
     componentName = _findComponentConfig.componentName,
@@ -237,7 +210,6 @@ function buildComponentSchema(ast) {
     commandTypeName = _findComponentConfig.commandTypeName,
     commandOptionsExpression = _findComponentConfig.commandOptionsExpression,
     optionsExpression = _findComponentConfig.optionsExpression;
-
   const types = getTypes(ast);
   const propProperties = getPropProperties(propsTypeName, types);
   const commandOptions = getCommandOptions(commandOptionsExpression);
@@ -262,7 +234,6 @@ function buildComponentSchema(ast) {
     commands,
   };
 }
-
 module.exports = {
   buildComponentSchema,
 };

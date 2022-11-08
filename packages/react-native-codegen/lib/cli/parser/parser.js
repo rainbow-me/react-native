@@ -7,14 +7,12 @@
  *
  * @format
  */
+
 'use strict';
 
 const path = require('path');
-
 const FlowParser = require('../../parsers/flow');
-
 const TypeScriptParser = require('../../parsers/typescript');
-
 function parseFiles(files) {
   files.forEach(filename => {
     const isTypeScript =
@@ -31,5 +29,4 @@ function parseFiles(files) {
     );
   });
 }
-
 module.exports = parseFiles;

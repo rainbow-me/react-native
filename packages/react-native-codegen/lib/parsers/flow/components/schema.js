@@ -7,6 +7,7 @@
  * @format
  *
  */
+
 'use strict';
 
 function ownKeys(object, enumerableOnly) {
@@ -21,7 +22,6 @@ function ownKeys(object, enumerableOnly) {
   }
   return keys;
 }
-
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = null != arguments[i] ? arguments[i] : {};
@@ -44,7 +44,6 @@ function _objectSpread(target) {
   }
   return target;
 }
-
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -58,7 +57,6 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-
 function wrapComponentSchema({
   filename,
   componentName,
@@ -88,7 +86,6 @@ function wrapComponentSchema({
     },
   };
 }
-
 module.exports = {
   wrapComponentSchema,
 };

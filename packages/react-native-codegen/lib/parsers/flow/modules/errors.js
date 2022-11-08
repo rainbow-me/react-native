@@ -7,13 +7,12 @@
  *
  * @format
  */
+
 'use strict';
 
 const invariant = require('invariant');
-
 const _require = require('../errors'),
   ParserError = _require.ParserError;
-
 class MisnamedModuleFlowInterfaceParserError extends ParserError {
   constructor(hasteModuleName, id) {
     super(
@@ -23,7 +22,6 @@ class MisnamedModuleFlowInterfaceParserError extends ParserError {
     );
   }
 }
-
 class ModuleFlowInterfaceNotFoundParserError extends ParserError {
   constructor(hasteModuleName, ast) {
     super(
@@ -33,14 +31,11 @@ class ModuleFlowInterfaceNotFoundParserError extends ParserError {
     );
   }
 }
-
 class MoreThanOneModuleFlowInterfaceParserError extends ParserError {
   constructor(hasteModuleName, flowModuleInterfaces, names) {
     const finalName = names[names.length - 1];
     const allButLastName = names.slice(0, -1);
-
     const quote = x => `'${x}'`;
-
     const nameStr =
       allButLastName.map(quote).join(', ') + ', and ' + quote(finalName);
     super(
@@ -50,7 +45,6 @@ class MoreThanOneModuleFlowInterfaceParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedModulePropertyParserError extends ParserError {
   constructor(
     hasteModuleName,
@@ -65,7 +59,6 @@ class UnsupportedModulePropertyParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedFlowTypeAnnotationParserError extends ParserError {
   constructor(hasteModuleName, typeAnnotation) {
     super(
@@ -76,7 +69,6 @@ class UnsupportedFlowTypeAnnotationParserError extends ParserError {
     this.typeAnnotationType = typeAnnotation.type;
   }
 }
-
 class UnsupportedFlowGenericParserError extends ParserError {
   constructor(hasteModuleName, genericTypeAnnotation) {
     const genericName = genericTypeAnnotation.id.name;
@@ -88,7 +80,6 @@ class UnsupportedFlowGenericParserError extends ParserError {
     this.genericName = genericName;
   }
 }
-
 class IncorrectlyParameterizedFlowGenericParserError extends ParserError {
   constructor(hasteModuleName, genericTypeAnnotation) {
     if (genericTypeAnnotation.typeParameters == null) {
@@ -99,7 +90,6 @@ class IncorrectlyParameterizedFlowGenericParserError extends ParserError {
       );
       return;
     }
-
     if (
       genericTypeAnnotation.typeParameters.type ===
         'TypeParameterInstantiation' &&
@@ -112,13 +102,13 @@ class IncorrectlyParameterizedFlowGenericParserError extends ParserError {
       );
       return;
     }
-
     invariant(
       false,
       "Couldn't create IncorrectlyParameterizedFlowGenericParserError",
     );
   }
 }
+
 /**
  * Array parsing errors
  */
@@ -137,6 +127,7 @@ class UnsupportedArrayElementTypeAnnotationParserError extends ParserError {
     );
   }
 }
+
 /**
  * Object parsing errors
  */
@@ -144,15 +135,12 @@ class UnsupportedArrayElementTypeAnnotationParserError extends ParserError {
 class UnsupportedObjectPropertyTypeAnnotationParserError extends ParserError {
   constructor(hasteModuleName, propertyAST, invalidPropertyType) {
     let message = `'ObjectTypeAnnotation' cannot contain '${invalidPropertyType}'.`;
-
     if (invalidPropertyType === 'ObjectTypeSpreadProperty') {
       message = "Object spread isn't supported in 'ObjectTypeAnnotation's.";
     }
-
     super(hasteModuleName, propertyAST, message);
   }
 }
-
 class UnsupportedObjectPropertyValueTypeAnnotationParserError extends ParserError {
   constructor(
     hasteModuleName,
@@ -167,6 +155,7 @@ class UnsupportedObjectPropertyValueTypeAnnotationParserError extends ParserErro
     );
   }
 }
+
 /**
  * Function parsing errors
  */
@@ -180,7 +169,6 @@ class UnnamedFunctionParamParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedFunctionParamTypeAnnotationParserError extends ParserError {
   constructor(
     hasteModuleName,
@@ -195,7 +183,6 @@ class UnsupportedFunctionParamTypeAnnotationParserError extends ParserError {
     );
   }
 }
-
 class UnsupportedFunctionReturnTypeAnnotationParserError extends ParserError {
   constructor(hasteModuleName, flowReturnTypeAnnotation, invalidReturnType) {
     super(
@@ -205,7 +192,6 @@ class UnsupportedFunctionReturnTypeAnnotationParserError extends ParserError {
     );
   }
 }
-
 class UnusedModuleFlowInterfaceParserError extends ParserError {
   constructor(hasteModuleName, flowInterface) {
     super(
@@ -215,7 +201,6 @@ class UnusedModuleFlowInterfaceParserError extends ParserError {
     );
   }
 }
-
 class MoreThanOneModuleRegistryCallsParserError extends ParserError {
   constructor(hasteModuleName, flowCallExpressions, numCalls) {
     super(
@@ -225,7 +210,6 @@ class MoreThanOneModuleRegistryCallsParserError extends ParserError {
     );
   }
 }
-
 class UntypedModuleRegistryCallParserError extends ParserError {
   constructor(hasteModuleName, flowCallExpression, methodName, moduleName) {
     super(
@@ -235,7 +219,6 @@ class UntypedModuleRegistryCallParserError extends ParserError {
     );
   }
 }
-
 class IncorrectModuleRegistryCallTypeParameterParserError extends ParserError {
   constructor(hasteModuleName, flowTypeArguments, methodName, moduleName) {
     super(
@@ -245,7 +228,6 @@ class IncorrectModuleRegistryCallTypeParameterParserError extends ParserError {
     );
   }
 }
-
 class IncorrectModuleRegistryCallArityParserError extends ParserError {
   constructor(hasteModuleName, flowCallExpression, methodName, incorrectArity) {
     super(
@@ -255,7 +237,6 @@ class IncorrectModuleRegistryCallArityParserError extends ParserError {
     );
   }
 }
-
 class IncorrectModuleRegistryCallArgumentTypeParserError extends ParserError {
   constructor(hasteModuleName, flowArgument, methodName, type) {
     const a = /[aeiouy]/.test(type.toLowerCase()) ? 'an' : 'a';
@@ -266,7 +247,6 @@ class IncorrectModuleRegistryCallArgumentTypeParserError extends ParserError {
     );
   }
 }
-
 module.exports = {
   IncorrectlyParameterizedFlowGenericParserError,
   MisnamedModuleFlowInterfaceParserError,

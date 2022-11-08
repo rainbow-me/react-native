@@ -7,59 +7,37 @@
  *
  * @format
  */
+
 'use strict';
+
 /*
 TODO:
 
 - ViewConfigs should spread in View's valid attributes
 */
-
 const fs = require('fs');
-
 const generateComponentDescriptorH = require('./components/GenerateComponentDescriptorH.js');
-
 const generateComponentHObjCpp = require('./components/GenerateComponentHObjCpp.js');
-
 const generateEventEmitterCpp = require('./components/GenerateEventEmitterCpp.js');
-
 const generateEventEmitterH = require('./components/GenerateEventEmitterH.js');
-
 const generatePropsCpp = require('./components/GeneratePropsCpp.js');
-
 const generatePropsH = require('./components/GeneratePropsH.js');
-
 const generateModuleH = require('./modules/GenerateModuleH.js');
-
 const generateModuleCpp = require('./modules/GenerateModuleCpp.js');
-
 const generateModuleObjCpp = require('./modules/GenerateModuleObjCpp');
-
 const generateModuleJavaSpec = require('./modules/GenerateModuleJavaSpec.js');
-
 const GenerateModuleJniCpp = require('./modules/GenerateModuleJniCpp.js');
-
 const GenerateModuleJniH = require('./modules/GenerateModuleJniH.js');
-
 const generatePropsJavaInterface = require('./components/GeneratePropsJavaInterface.js');
-
 const generatePropsJavaDelegate = require('./components/GeneratePropsJavaDelegate.js');
-
 const generateTests = require('./components/GenerateTests.js');
-
 const generateShadowNodeCpp = require('./components/GenerateShadowNodeCpp.js');
-
 const generateShadowNodeH = require('./components/GenerateShadowNodeH.js');
-
 const generateThirdPartyFabricComponentsProviderObjCpp = require('./components/GenerateThirdPartyFabricComponentsProviderObjCpp.js');
-
 const generateThirdPartyFabricComponentsProviderH = require('./components/GenerateThirdPartyFabricComponentsProviderH.js');
-
 const generateViewConfigJs = require('./components/GenerateViewConfigJs.js');
-
 const path = require('path');
-
 const schemaValidator = require('../SchemaValidator.js');
-
 const LIBRARY_GENERATORS = {
   descriptors: [generateComponentDescriptorH.generate],
   events: [generateEventEmitterCpp.generate, generateEventEmitterH.generate],
@@ -79,7 +57,8 @@ const LIBRARY_GENERATORS = {
     generatePropsCpp.generate,
     generatePropsH.generate,
     generateShadowNodeCpp.generate,
-    generateShadowNodeH.generate, // Java files
+    generateShadowNodeH.generate,
+    // Java files
     generatePropsJavaInterface.generate,
     generatePropsJavaDelegate.generate,
   ],
@@ -112,20 +91,17 @@ const SCHEMAS_GENERATORS = {
     generateThirdPartyFabricComponentsProviderH.generate,
   ],
 };
-
 function writeMapToFiles(map, outputDir) {
   let success = true;
   map.forEach((contents, fileName) => {
     try {
       const location = path.join(outputDir, fileName);
       const dirName = path.dirname(location);
-
       if (!fs.existsSync(dirName)) {
         fs.mkdirSync(dirName, {
           recursive: true,
         });
       }
-
       fs.writeFileSync(location, contents);
     } catch (error) {
       success = false;
@@ -134,13 +110,11 @@ function writeMapToFiles(map, outputDir) {
   });
   return success;
 }
-
 function checkFilesForChanges(map, outputDir) {
   let hasChanged = false;
   map.forEach((contents, fileName) => {
     const location = path.join(outputDir, fileName);
     const currentContents = fs.readFileSync(location, 'utf8');
-
     if (currentContents !== contents) {
       console.error(`- ${fileName} has changed`);
       hasChanged = true;
@@ -148,7 +122,6 @@ function checkFilesForChanges(map, outputDir) {
   });
   return !hasChanged;
 }
-
 module.exports = {
   generate(
     {libraryName, schema, outputDirectory, packageName, assumeNonnull},
@@ -156,7 +129,6 @@ module.exports = {
   ) {
     schemaValidator.validate(schema);
     const generatedFiles = [];
-
     for (const name of generators) {
       for (const generator of LIBRARY_GENERATORS[name]) {
         generatedFiles.push(
@@ -164,48 +136,37 @@ module.exports = {
         );
       }
     }
-
     const filesToUpdate = new Map([...generatedFiles]);
-
     if (test === true) {
       return checkFilesForChanges(filesToUpdate, outputDirectory);
     }
-
     return writeMapToFiles(filesToUpdate, outputDirectory);
   },
-
   generateFromSchemas({schemas, outputDirectory}, {generators, test}) {
     Object.keys(schemas).forEach(libraryName =>
       schemaValidator.validate(schemas[libraryName]),
     );
     const generatedFiles = [];
-
     for (const name of generators) {
       for (const generator of SCHEMAS_GENERATORS[name]) {
         generatedFiles.push(...generator(schemas));
       }
     }
-
     const filesToUpdate = new Map([...generatedFiles]);
-
     if (test === true) {
       return checkFilesForChanges(filesToUpdate, outputDirectory);
     }
-
     return writeMapToFiles(filesToUpdate, outputDirectory);
   },
-
   generateViewConfig({libraryName, schema}) {
     schemaValidator.validate(schema);
     const result = generateViewConfigJs
       .generate(libraryName, schema)
       .values()
       .next();
-
     if (typeof result.value !== 'string') {
       throw new Error(`Failed to generate view config for ${libraryName}`);
     }
-
     return result.value;
   },
 };

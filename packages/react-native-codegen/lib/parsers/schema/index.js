@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function parse(filename) {
@@ -17,7 +18,6 @@ function parse(filename) {
     // Ignore
   }
 }
-
 module.exports = {
   parse,
 };

@@ -7,12 +7,12 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('./CppHelpers'),
   getImports = _require.getImports,
   toSafeCppString = _require.toSafeCppString;
-
 const FileTemplate = ({libraryName, imports, componentTests}) =>
   `
 /**
@@ -32,7 +32,6 @@ ${imports}
 using namespace facebook::react;
 ${componentTests}
 `.trim();
-
 const TestTemplate = ({componentName, testName, propName, propValue}) => `
 TEST(${componentName}_${testName}, etc) {
   auto propParser = RawPropsParser();
@@ -47,10 +46,8 @@ TEST(${componentName}_${testName}, etc) {
   ${componentName}(parserContext, sourceProps, rawProps);
 }
 `;
-
 function getTestCasesForProp(propName, typeAnnotation) {
   const cases = [];
-
   if (typeAnnotation.type === 'StringEnumTypeAnnotation') {
     typeAnnotation.options.forEach(option =>
       cases.push({
@@ -71,7 +68,8 @@ function getTestCasesForProp(propName, typeAnnotation) {
     cases.push({
       propName: propName,
       propValue: typeAnnotation.default != null ? typeAnnotation.default : true,
-    }); // $FlowFixMe[incompatible-type]
+    });
+    // $FlowFixMe[incompatible-type]
   } else if (typeAnnotation.type === 'IntegerTypeAnnotation') {
     cases.push({
       propName,
@@ -102,10 +100,8 @@ function getTestCasesForProp(propName, typeAnnotation) {
       });
     }
   }
-
   return cases;
 }
-
 function generateTestsString(name, component) {
   function createTest({testName, propName, propValue, raw = false}) {
     const value =
@@ -117,7 +113,6 @@ function generateTestsString(name, component) {
       propValue: String(value),
     });
   }
-
   const testCases = component.props.reduce((cases, prop) => {
     return cases.concat(getTestCasesForProp(prop.name, prop.typeAnnotation));
   }, []);
@@ -128,7 +123,6 @@ function generateTestsString(name, component) {
   };
   return [baseTest, ...testCases].map(createTest).join('');
 }
-
 module.exports = {
   generate(libraryName, schema, packageName, assumeNonnull = false) {
     const fileName = 'Tests.cpp';
@@ -140,23 +134,19 @@ module.exports = {
     const componentTests = Object.keys(schema.modules)
       .map(moduleName => {
         const module = schema.modules[moduleName];
-
         if (module.type !== 'Component') {
           return;
         }
-
         const components = module.components;
-
         if (components == null) {
           return null;
         }
-
         return Object.keys(components)
           .map(componentName => {
             const component = components[componentName];
             const name = `${componentName}Props`;
-            const imports = getImports(component.props); // $FlowFixMe[method-unbinding] added when improving typing for this parameters
-
+            const imports = getImports(component.props);
+            // $FlowFixMe[method-unbinding] added when improving typing for this parameters
             imports.forEach(allImports.add, allImports);
             return generateTestsString(name, component);
           })

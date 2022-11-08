@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function _slicedToArray(arr, i) {
@@ -17,13 +18,11 @@ function _slicedToArray(arr, i) {
     _nonIterableRest()
   );
 }
-
 function _nonIterableRest() {
   throw new TypeError(
     'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.',
   );
 }
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -33,13 +32,11 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
     return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-
 function _iterableToArrayLimit(arr, i) {
   var _i =
     arr == null
@@ -68,29 +65,21 @@ function _iterableToArrayLimit(arr, i) {
   }
   return _arr;
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 const invariant = require('invariant');
-
 const _require = require('./StructCollector'),
   StructCollector = _require.StructCollector;
-
 const _require2 = require('./Utils'),
   getNamespacedStructName = _require2.getNamespacedStructName;
-
 const _require3 = require('../../Utils'),
   capitalize = _require3.capitalize;
-
 const _require4 = require('../../../parsers/flow/modules/utils'),
   wrapNullable = _require4.wrapNullable,
   unwrapNullable = _require4.unwrapNullable;
-
 const ProtocolMethodTemplate = ({returnObjCType, methodName, params}) =>
   `- (${returnObjCType})${methodName}${params};`;
-
 function serializeMethod(
   hasteModuleName,
   property,
@@ -99,13 +88,10 @@ function serializeMethod(
 ) {
   const methodName = property.name,
     nullableTypeAnnotation = property.typeAnnotation;
-
   const _unwrapNullable = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable2 = _slicedToArray(_unwrapNullable, 1),
     propertyTypeAnnotation = _unwrapNullable2[0];
-
   const params = propertyTypeAnnotation.params;
-
   if (methodName === 'getConstants') {
     return serializeConstantsProtocolMethods(
       hasteModuleName,
@@ -114,12 +100,10 @@ function serializeMethod(
       resolveAlias,
     );
   }
-
   const methodParams = [];
   const structParamRecords = [];
   params.forEach((param, index) => {
     const structName = getParamStructName(methodName, param);
-
     const _getParamObjCType = getParamObjCType(
         hasteModuleName,
         methodName,
@@ -130,27 +114,25 @@ function serializeMethod(
       ),
       objCType = _getParamObjCType.objCType,
       isStruct = _getParamObjCType.isStruct;
-
     methodParams.push({
       paramName: param.name,
       objCType,
     });
-
     if (isStruct) {
       structParamRecords.push({
         paramIndex: index,
         structName,
       });
     }
-  }); // Unwrap returnTypeAnnotation, so we check if the return type is Promise
-  // TODO(T76719514): Disallow nullable PromiseTypeAnnotations
+  });
 
+  // Unwrap returnTypeAnnotation, so we check if the return type is Promise
+  // TODO(T76719514): Disallow nullable PromiseTypeAnnotations
   const _unwrapNullable3 = unwrapNullable(
       propertyTypeAnnotation.returnTypeAnnotation,
     ),
     _unwrapNullable4 = _slicedToArray(_unwrapNullable3, 1),
     returnTypeAnnotation = _unwrapNullable4[0];
-
   if (returnTypeAnnotation.type === 'PromiseTypeAnnotation') {
     methodParams.push(
       {
@@ -163,10 +145,10 @@ function serializeMethod(
       },
     );
   }
+
   /**
    * Build Protocol Method
    **/
-
   const returnObjCType = getReturnObjCType(
     methodName,
     propertyTypeAnnotation.returnTypeAnnotation,
@@ -187,20 +169,20 @@ function serializeMethod(
     returnObjCType,
     params: objCParams,
   });
+
   /**
    * Build ObjC Selector
    */
   // $FlowFixMe[missing-type-arg]
-
   const selector = methodParams
     .map(({paramName}) => paramName)
     .reduce(($selector, paramName, i) => {
       return i === 0 ? `${$selector}:` : `${$selector}${paramName}:`;
     }, methodName);
+
   /**
    * Build JS Return type
    */
-
   const returnJSType = getReturnJSType(methodName, returnTypeAnnotation);
   return [
     {
@@ -213,19 +195,15 @@ function serializeMethod(
     },
   ];
 }
-
 function getParamStructName(methodName, param) {
   const _unwrapNullable5 = unwrapNullable(param.typeAnnotation),
     _unwrapNullable6 = _slicedToArray(_unwrapNullable5, 1),
     typeAnnotation = _unwrapNullable6[0];
-
   if (typeAnnotation.type === 'TypeAliasTypeAnnotation') {
     return typeAnnotation.name;
   }
-
   return `Spec${capitalize(methodName)}${capitalize(param.name)}`;
 }
-
 function getParamObjCType(
   hasteModuleName,
   methodName,
@@ -236,33 +214,28 @@ function getParamObjCType(
 ) {
   const paramName = param.name,
     nullableTypeAnnotation = param.typeAnnotation;
-
   const _unwrapNullable7 = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable8 = _slicedToArray(_unwrapNullable7, 2),
     typeAnnotation = _unwrapNullable8[0],
     nullable = _unwrapNullable8[1];
-
   const notRequired = param.optional || nullable;
-
   function wrapIntoNullableIfNeeded(generatedType) {
     return nullable ? `${generatedType} _Nullable` : generatedType;
   }
-
   const isStruct = objCType => ({
     isStruct: true,
     objCType,
   });
-
   const notStruct = objCType => ({
     isStruct: false,
     objCType,
-  }); // Handle types that can only be in parameters
+  });
 
+  // Handle types that can only be in parameters
   switch (typeAnnotation.type) {
     case 'FunctionTypeAnnotation': {
       return notStruct('RCTResponseSenderBlock');
     }
-
     case 'ArrayTypeAnnotation': {
       /**
        * Array in params always codegen NSArray *
@@ -277,7 +250,6 @@ function getParamObjCType(
       return notStruct(wrapIntoNullableIfNeeded('NSArray *'));
     }
   }
-
   const _unwrapNullable9 = unwrapNullable(
       structCollector.process(
         structName,
@@ -288,12 +260,10 @@ function getParamObjCType(
     ),
     _unwrapNullable10 = _slicedToArray(_unwrapNullable9, 1),
     structTypeAnnotation = _unwrapNullable10[0];
-
   invariant(
     structTypeAnnotation.type !== 'ArrayTypeAnnotation',
     'ArrayTypeAnnotations should have been processed earlier',
   );
-
   switch (structTypeAnnotation.type) {
     case 'TypeAliasTypeAnnotation': {
       /**
@@ -304,40 +274,30 @@ function getParamObjCType(
           ' &',
       );
     }
-
     case 'ReservedTypeAnnotation':
       switch (structTypeAnnotation.name) {
         case 'RootTag':
           return notStruct(notRequired ? 'NSNumber *' : 'double');
-
         default:
           structTypeAnnotation.name;
           throw new Error(
             `Unsupported type for param "${paramName}" in ${methodName}. Found: ${structTypeAnnotation.type}`,
           );
       }
-
     case 'StringTypeAnnotation':
       return notStruct(wrapIntoNullableIfNeeded('NSString *'));
-
     case 'NumberTypeAnnotation':
       return notStruct(notRequired ? 'NSNumber *' : 'double');
-
     case 'FloatTypeAnnotation':
       return notStruct(notRequired ? 'NSNumber *' : 'double');
-
     case 'DoubleTypeAnnotation':
       return notStruct(notRequired ? 'NSNumber *' : 'double');
-
     case 'Int32TypeAnnotation':
       return notStruct(notRequired ? 'NSNumber *' : 'double');
-
     case 'BooleanTypeAnnotation':
       return notStruct(notRequired ? 'NSNumber *' : 'BOOL');
-
     case 'GenericObjectTypeAnnotation':
       return notStruct(wrapIntoNullableIfNeeded('NSDictionary *'));
-
     default:
       structTypeAnnotation.type;
       throw new Error(
@@ -345,77 +305,59 @@ function getParamObjCType(
       );
   }
 }
-
 function getReturnObjCType(methodName, nullableTypeAnnotation) {
   const _unwrapNullable11 = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable12 = _slicedToArray(_unwrapNullable11, 2),
     typeAnnotation = _unwrapNullable12[0],
     nullable = _unwrapNullable12[1];
-
   function wrapIntoNullableIfNeeded(generatedType) {
     return nullable ? `${generatedType} _Nullable` : generatedType;
   }
-
   switch (typeAnnotation.type) {
     case 'VoidTypeAnnotation':
       return 'void';
-
     case 'PromiseTypeAnnotation':
       return 'void';
-
     case 'ObjectTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSDictionary *');
-
     case 'TypeAliasTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSDictionary *');
-
     case 'ArrayTypeAnnotation':
       if (typeAnnotation.elementType == null) {
         return wrapIntoNullableIfNeeded('NSArray<id<NSObject>> *');
       }
-
       return wrapIntoNullableIfNeeded(
         `NSArray<${getReturnObjCType(
           methodName,
           typeAnnotation.elementType,
         )}> *`,
       );
-
     case 'ReservedTypeAnnotation':
       switch (typeAnnotation.name) {
         case 'RootTag':
           return wrapIntoNullableIfNeeded('NSNumber *');
-
         default:
           typeAnnotation.name;
           throw new Error(
             `Unsupported return type for ${methodName}. Found: ${typeAnnotation.name}`,
           );
       }
-
     case 'StringTypeAnnotation':
       // TODO: Can NSString * returns not be _Nullable?
       // In the legacy codegen, we don't surround NSSTring * with _Nullable
       return wrapIntoNullableIfNeeded('NSString *');
-
     case 'NumberTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSNumber *');
-
     case 'FloatTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSNumber *');
-
     case 'DoubleTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSNumber *');
-
     case 'Int32TypeAnnotation':
       return wrapIntoNullableIfNeeded('NSNumber *');
-
     case 'BooleanTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSNumber *');
-
     case 'GenericObjectTypeAnnotation':
       return wrapIntoNullableIfNeeded('NSDictionary *');
-
     default:
       typeAnnotation.type;
       throw new Error(
@@ -423,52 +365,37 @@ function getReturnObjCType(methodName, nullableTypeAnnotation) {
       );
   }
 }
-
 function getReturnJSType(methodName, nullableTypeAnnotation) {
   const _unwrapNullable13 = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable14 = _slicedToArray(_unwrapNullable13, 1),
     typeAnnotation = _unwrapNullable14[0];
-
   switch (typeAnnotation.type) {
     case 'VoidTypeAnnotation':
       return 'VoidKind';
-
     case 'PromiseTypeAnnotation':
       return 'PromiseKind';
-
     case 'ObjectTypeAnnotation':
       return 'ObjectKind';
-
     case 'TypeAliasTypeAnnotation':
       return 'ObjectKind';
-
     case 'ArrayTypeAnnotation':
       return 'ArrayKind';
-
     case 'ReservedTypeAnnotation':
       return 'NumberKind';
-
     case 'StringTypeAnnotation':
       return 'StringKind';
-
     case 'NumberTypeAnnotation':
       return 'NumberKind';
-
     case 'FloatTypeAnnotation':
       return 'NumberKind';
-
     case 'DoubleTypeAnnotation':
       return 'NumberKind';
-
     case 'Int32TypeAnnotation':
       return 'NumberKind';
-
     case 'BooleanTypeAnnotation':
       return 'BooleanKind';
-
     case 'GenericObjectTypeAnnotation':
       return 'ObjectKind';
-
     default:
       typeAnnotation.type;
       throw new Error(
@@ -476,7 +403,6 @@ function getReturnJSType(methodName, nullableTypeAnnotation) {
       );
   }
 }
-
 function serializeConstantsProtocolMethods(
   hasteModuleName,
   property,
@@ -486,25 +412,20 @@ function serializeConstantsProtocolMethods(
   const _unwrapNullable15 = unwrapNullable(property.typeAnnotation),
     _unwrapNullable16 = _slicedToArray(_unwrapNullable15, 1),
     propertyTypeAnnotation = _unwrapNullable16[0];
-
   if (propertyTypeAnnotation.params.length !== 0) {
     throw new Error(
       `${hasteModuleName}.getConstants() may only accept 0 arguments.`,
     );
   }
-
   const returnTypeAnnotation = propertyTypeAnnotation.returnTypeAnnotation;
-
   if (returnTypeAnnotation.type !== 'ObjectTypeAnnotation') {
     throw new Error(
       `${hasteModuleName}.getConstants() may only return an object literal: {...}.`,
     );
   }
-
   if (returnTypeAnnotation.properties.length === 0) {
     return [];
   }
-
   const realTypeAnnotation = structCollector.process(
     'Constants',
     'CONSTANTS',
@@ -515,8 +436,9 @@ function serializeConstantsProtocolMethods(
     realTypeAnnotation.type === 'TypeAliasTypeAnnotation',
     "Unable to generate C++ struct from module's getConstants() method return type.",
   );
-  const returnObjCType = `facebook::react::ModuleConstants<JS::${hasteModuleName}::Constants::Builder>`; // $FlowFixMe[missing-type-arg]
+  const returnObjCType = `facebook::react::ModuleConstants<JS::${hasteModuleName}::Constants::Builder>`;
 
+  // $FlowFixMe[missing-type-arg]
   return ['constantsToExport', 'getConstants'].map(methodName => {
     const protocolMethod = ProtocolMethodTemplate({
       methodName,
@@ -533,7 +455,6 @@ function serializeConstantsProtocolMethods(
     };
   });
 }
-
 module.exports = {
   serializeMethod,
 };

@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function _slicedToArray(arr, i) {
@@ -17,13 +18,11 @@ function _slicedToArray(arr, i) {
     _nonIterableRest()
   );
 }
-
 function _nonIterableRest() {
   throw new TypeError(
     'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.',
   );
 }
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -33,13 +32,11 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
     return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-
 function _iterableToArrayLimit(arr, i) {
   var _i =
     arr == null
@@ -68,18 +65,14 @@ function _iterableToArrayLimit(arr, i) {
   }
   return _arr;
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 const _require = require('./Utils'),
   createAliasResolver = _require.createAliasResolver,
   getModules = _require.getModules;
-
 const _require2 = require('../../parsers/flow/modules/utils'),
   unwrapNullable = _require2.unwrapNullable;
-
 const HostFunctionTemplate = ({
   hasteModuleName,
   propertyName,
@@ -90,7 +83,6 @@ const HostFunctionTemplate = ({
   return static_cast<JavaTurboModule &>(turboModule).invokeJavaMethod(rt, ${jsReturnType}, "${propertyName}", "${jniSignature}", args, count);
 }`;
 };
-
 const ModuleClassConstructorTemplate = ({hasteModuleName, methods}) => {
   return `
 ${hasteModuleName}SpecJSI::${hasteModuleName}SpecJSI(const JavaTurboModule::InitParams &params)
@@ -102,13 +94,11 @@ ${methods
   .join('\n')}
 }`.trim();
 };
-
 const ModuleLookupTemplate = ({moduleName, hasteModuleName}) => {
   return `  if (moduleName == "${moduleName}") {
     return std::make_shared<${hasteModuleName}SpecJSI>(params);
   }`;
 };
-
 const FileTemplate = ({libraryName, include, modules, moduleLookups}) => {
   return `
 /**
@@ -136,64 +126,47 @@ ${moduleLookups.map(ModuleLookupTemplate).join('\n')}
 } // namespace facebook
 `;
 };
-
 function translateReturnTypeToKind(nullableTypeAnnotation, resolveAlias) {
   const _unwrapNullable = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable2 = _slicedToArray(_unwrapNullable, 1),
     typeAnnotation = _unwrapNullable2[0];
-
   let realTypeAnnotation = typeAnnotation;
-
   if (realTypeAnnotation.type === 'TypeAliasTypeAnnotation') {
     realTypeAnnotation = resolveAlias(realTypeAnnotation.name);
   }
-
   switch (realTypeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (realTypeAnnotation.name) {
         case 'RootTag':
           return 'NumberKind';
-
         default:
           realTypeAnnotation.name;
           throw new Error(
             `Invalid ReservedFunctionValueTypeName name, got ${realTypeAnnotation.name}`,
           );
       }
-
     case 'VoidTypeAnnotation':
       return 'VoidKind';
-
     case 'StringTypeAnnotation':
       return 'StringKind';
-
     case 'BooleanTypeAnnotation':
       return 'BooleanKind';
-
     case 'NumberTypeAnnotation':
       return 'NumberKind';
-
     case 'DoubleTypeAnnotation':
       return 'NumberKind';
-
     case 'FloatTypeAnnotation':
       return 'NumberKind';
-
     case 'Int32TypeAnnotation':
       return 'NumberKind';
-
     case 'PromiseTypeAnnotation':
       return 'PromiseKind';
-
     case 'GenericObjectTypeAnnotation':
       return 'ObjectKind';
-
     case 'ObjectTypeAnnotation':
       return 'ObjectKind';
-
     case 'ArrayTypeAnnotation':
       return 'ArrayKind';
-
     default:
       realTypeAnnotation.type;
       throw new Error(
@@ -201,66 +174,49 @@ function translateReturnTypeToKind(nullableTypeAnnotation, resolveAlias) {
       );
   }
 }
-
 function translateParamTypeToJniType(param, resolveAlias) {
   const optional = param.optional,
     nullableTypeAnnotation = param.typeAnnotation;
-
   const _unwrapNullable3 = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable4 = _slicedToArray(_unwrapNullable3, 2),
     typeAnnotation = _unwrapNullable4[0],
     nullable = _unwrapNullable4[1];
-
   const isRequired = !optional && !nullable;
   let realTypeAnnotation = typeAnnotation;
-
   if (realTypeAnnotation.type === 'TypeAliasTypeAnnotation') {
     realTypeAnnotation = resolveAlias(realTypeAnnotation.name);
   }
-
   switch (realTypeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (realTypeAnnotation.name) {
         case 'RootTag':
           return !isRequired ? 'Ljava/lang/Double;' : 'D';
-
         default:
           realTypeAnnotation.name;
           throw new Error(
             `Invalid ReservedFunctionValueTypeName name, got ${realTypeAnnotation.name}`,
           );
       }
-
     case 'StringTypeAnnotation':
       return 'Ljava/lang/String;';
-
     case 'BooleanTypeAnnotation':
       return !isRequired ? 'Ljava/lang/Boolean;' : 'Z';
-
     case 'NumberTypeAnnotation':
       return !isRequired ? 'Ljava/lang/Double;' : 'D';
-
     case 'DoubleTypeAnnotation':
       return !isRequired ? 'Ljava/lang/Double;' : 'D';
-
     case 'FloatTypeAnnotation':
       return !isRequired ? 'Ljava/lang/Double;' : 'D';
-
     case 'Int32TypeAnnotation':
       return !isRequired ? 'Ljava/lang/Double;' : 'D';
-
     case 'GenericObjectTypeAnnotation':
       return 'Lcom/facebook/react/bridge/ReadableMap;';
-
     case 'ObjectTypeAnnotation':
       return 'Lcom/facebook/react/bridge/ReadableMap;';
-
     case 'ArrayTypeAnnotation':
       return 'Lcom/facebook/react/bridge/ReadableArray;';
-
     case 'FunctionTypeAnnotation':
       return 'Lcom/facebook/react/bridge/Callback;';
-
     default:
       realTypeAnnotation.type;
       throw new Error(
@@ -268,65 +224,48 @@ function translateParamTypeToJniType(param, resolveAlias) {
       );
   }
 }
-
 function translateReturnTypeToJniType(nullableTypeAnnotation, resolveAlias) {
   const _unwrapNullable5 = unwrapNullable(nullableTypeAnnotation),
     _unwrapNullable6 = _slicedToArray(_unwrapNullable5, 2),
     typeAnnotation = _unwrapNullable6[0],
     nullable = _unwrapNullable6[1];
-
   let realTypeAnnotation = typeAnnotation;
-
   if (realTypeAnnotation.type === 'TypeAliasTypeAnnotation') {
     realTypeAnnotation = resolveAlias(realTypeAnnotation.name);
   }
-
   switch (realTypeAnnotation.type) {
     case 'ReservedTypeAnnotation':
       switch (realTypeAnnotation.name) {
         case 'RootTag':
           return nullable ? 'Ljava/lang/Double;' : 'D';
-
         default:
           realTypeAnnotation.name;
           throw new Error(
             `Invalid ReservedFunctionValueTypeName name, got ${realTypeAnnotation.name}`,
           );
       }
-
     case 'VoidTypeAnnotation':
       return 'V';
-
     case 'StringTypeAnnotation':
       return 'Ljava/lang/String;';
-
     case 'BooleanTypeAnnotation':
       return nullable ? 'Ljava/lang/Boolean;' : 'Z';
-
     case 'NumberTypeAnnotation':
       return nullable ? 'Ljava/lang/Double;' : 'D';
-
     case 'DoubleTypeAnnotation':
       return nullable ? 'Ljava/lang/Double;' : 'D';
-
     case 'FloatTypeAnnotation':
       return nullable ? 'Ljava/lang/Double;' : 'D';
-
     case 'Int32TypeAnnotation':
       return nullable ? 'Ljava/lang/Double;' : 'D';
-
     case 'PromiseTypeAnnotation':
       return 'Lcom/facebook/react/bridge/Promise;';
-
     case 'GenericObjectTypeAnnotation':
       return 'Lcom/facebook/react/bridge/WritableMap;';
-
     case 'ObjectTypeAnnotation':
       return 'Lcom/facebook/react/bridge/WritableMap;';
-
     case 'ArrayTypeAnnotation':
       return 'Lcom/facebook/react/bridge/WritableArray;';
-
     default:
       realTypeAnnotation.type;
       throw new Error(
@@ -334,38 +273,31 @@ function translateReturnTypeToJniType(nullableTypeAnnotation, resolveAlias) {
       );
   }
 }
-
 function translateMethodTypeToJniSignature(property, resolveAlias) {
   const name = property.name,
     typeAnnotation = property.typeAnnotation;
-
   let _unwrapNullable7 = unwrapNullable(typeAnnotation),
     _unwrapNullable8 = _slicedToArray(_unwrapNullable7, 1),
     _unwrapNullable8$ = _unwrapNullable8[0],
     returnTypeAnnotation = _unwrapNullable8$.returnTypeAnnotation,
     params = _unwrapNullable8$.params;
-
   params = [...params];
   let processedReturnTypeAnnotation = returnTypeAnnotation;
   const isPromiseReturn = returnTypeAnnotation.type === 'PromiseTypeAnnotation';
-
   if (isPromiseReturn) {
     processedReturnTypeAnnotation = {
       type: 'VoidTypeAnnotation',
     };
   }
-
   const argsSignatureParts = params.map(t => {
     return translateParamTypeToJniType(t, resolveAlias);
   });
-
   if (isPromiseReturn) {
     // Additional promise arg for this case.
     argsSignatureParts.push(
       translateReturnTypeToJniType(returnTypeAnnotation, resolveAlias),
     );
   }
-
   const argsSignature = argsSignatureParts.join('');
   const returnSignature =
     name === 'getConstants'
@@ -376,7 +308,6 @@ function translateMethodTypeToJniSignature(property, resolveAlias) {
         );
   return `(${argsSignature})${returnSignature}`;
 }
-
 function translateMethodForImplementation(
   hasteModuleName,
   property,
@@ -385,9 +316,7 @@ function translateMethodForImplementation(
   const _unwrapNullable9 = unwrapNullable(property.typeAnnotation),
     _unwrapNullable10 = _slicedToArray(_unwrapNullable9, 1),
     propertyTypeAnnotation = _unwrapNullable10[0];
-
   const returnTypeAnnotation = propertyTypeAnnotation.returnTypeAnnotation;
-
   if (
     property.name === 'getConstants' &&
     returnTypeAnnotation.type === 'ObjectTypeAnnotation' &&
@@ -395,7 +324,6 @@ function translateMethodForImplementation(
   ) {
     return '';
   }
-
   return HostFunctionTemplate({
     hasteModuleName,
     propertyName: property.name,
@@ -403,7 +331,6 @@ function translateMethodForImplementation(
     jsReturnType: translateReturnTypeToKind(returnTypeAnnotation, resolveAlias),
   });
 }
-
 module.exports = {
   generate(libraryName, schema, packageName, assumeNonnull = false) {
     const nativeModules = getModules(schema);
@@ -443,7 +370,6 @@ module.exports = {
                   returnTypeAnnotation =
                     _unwrapNullable12$.returnTypeAnnotation,
                   params = _unwrapNullable12$.params;
-
                 if (
                   propertyName === 'getConstants' &&
                   returnTypeAnnotation.type === 'ObjectTypeAnnotation' &&
@@ -452,7 +378,6 @@ module.exports = {
                 ) {
                   return null;
                 }
-
                 return {
                   propertyName,
                   argCount: params.length,
@@ -462,8 +387,9 @@ module.exports = {
           })
         );
       })
-      .join('\n'); // $FlowFixMe[missing-type-arg]
+      .join('\n');
 
+    // $FlowFixMe[missing-type-arg]
     const moduleLookups = Object.keys(nativeModules)
       .filter(hasteModuleName => {
         const module = nativeModules[hasteModuleName];
@@ -477,13 +403,11 @@ module.exports = {
         const moduleB = nativeModules[b];
         const nameA = moduleA.moduleNames[0];
         const nameB = moduleB.moduleNames[0];
-
         if (nameA < nameB) {
           return -1;
         } else if (nameA > nameB) {
           return 1;
         }
-
         return 0;
       })
       .flatMap(hasteModuleName => {

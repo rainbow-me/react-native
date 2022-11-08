@@ -7,19 +7,16 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('../../Utils'),
   capitalize = _require.capitalize;
-
 function toJavaType(typeAnnotation, addImport) {
   const importNullable = () => addImport('androidx.annotation.Nullable');
-
   const importReadableMap = () =>
     addImport('com.facebook.react.bridge.ReadableMap');
-
   const importArrayList = () => addImport('java.util.ArrayList');
-
   switch (typeAnnotation.type) {
     /**
      * Primitives
@@ -32,16 +29,13 @@ function toJavaType(typeAnnotation, addImport) {
         return 'boolean';
       }
     }
-
     case 'StringTypeAnnotation': {
       importNullable();
       return '@Nullable String';
     }
-
     case 'DoubleTypeAnnotation': {
       return 'double';
     }
-
     case 'FloatTypeAnnotation': {
       if (typeAnnotation.default === null) {
         importNullable();
@@ -50,7 +44,6 @@ function toJavaType(typeAnnotation, addImport) {
         return 'float';
       }
     }
-
     case 'Int32TypeAnnotation': {
       return 'int';
     }
@@ -59,12 +52,10 @@ function toJavaType(typeAnnotation, addImport) {
      * Enums
      */
     // TODO: Make StringEnumTypeAnnotation type-safe?
-
     case 'StringEnumTypeAnnotation':
       importNullable();
       return '@Nullable String';
     // TODO: Make Int32EnumTypeAnnotation type-safe?
-
     case 'Int32EnumTypeAnnotation':
       importNullable();
       return '@Nullable Integer';
@@ -72,31 +63,29 @@ function toJavaType(typeAnnotation, addImport) {
     /**
      * Reserved types
      */
-
     case 'ReservedPropTypeAnnotation': {
       switch (typeAnnotation.name) {
         case 'ColorPrimitive':
           importNullable();
           return '@Nullable Integer';
-        // TODO: Make ImageSourcePrimitive type-safe
 
+        // TODO: Make ImageSourcePrimitive type-safe
         case 'ImageSourcePrimitive':
           importNullable();
           importReadableMap();
           return '@Nullable ReadableMap';
-        // TODO: Make PointPrimitive type-safe
 
+        // TODO: Make PointPrimitive type-safe
         case 'PointPrimitive':
           importNullable();
           importReadableMap();
           return '@Nullable ReadableMap';
-        // TODO: Make EdgeInsetsPrimitive type-safe
 
+        // TODO: Make EdgeInsetsPrimitive type-safe
         case 'EdgeInsetsPrimitive':
           importNullable();
           importReadableMap();
           return '@Nullable ReadableMap';
-
         default:
           typeAnnotation.name;
           throw new Error(
@@ -108,7 +97,6 @@ function toJavaType(typeAnnotation, addImport) {
     /**
      * Other Pojo objects
      */
-
     case 'PojoTypeAliasTypeAnnotation': {
       return typeAnnotation.name;
     }
@@ -116,10 +104,8 @@ function toJavaType(typeAnnotation, addImport) {
     /**
      * Arrays
      */
-
     case 'ArrayTypeAnnotation': {
       const elementType = typeAnnotation.elementType;
-
       const elementTypeString = (() => {
         switch (elementType.type) {
           /**
@@ -128,19 +114,15 @@ function toJavaType(typeAnnotation, addImport) {
           case 'BooleanTypeAnnotation': {
             return 'Boolean';
           }
-
           case 'StringTypeAnnotation': {
             return 'String';
           }
-
           case 'DoubleTypeAnnotation': {
             return 'Double';
           }
-
           case 'FloatTypeAnnotation': {
             return 'Float';
           }
-
           case 'Int32TypeAnnotation': {
             return 'Integer';
           }
@@ -149,7 +131,6 @@ function toJavaType(typeAnnotation, addImport) {
            * Enums
            */
           // TODO: Make StringEnums type-safe in Pojos
-
           case 'StringEnumTypeAnnotation': {
             return 'String';
           }
@@ -157,7 +138,6 @@ function toJavaType(typeAnnotation, addImport) {
           /**
            * Other Pojo objects
            */
-
           case 'PojoTypeAliasTypeAnnotation': {
             return elementType.name;
           }
@@ -165,27 +145,25 @@ function toJavaType(typeAnnotation, addImport) {
           /**
            * Reserved types
            */
-
           case 'ReservedPropTypeAnnotation': {
             switch (elementType.name) {
               case 'ColorPrimitive':
                 return 'Integer';
-              // TODO: Make ImageSourcePrimitive type-safe
 
+              // TODO: Make ImageSourcePrimitive type-safe
               case 'ImageSourcePrimitive':
                 importReadableMap();
                 return 'ReadableMap';
-              // TODO: Make PointPrimitive type-safe
 
+              // TODO: Make PointPrimitive type-safe
               case 'PointPrimitive':
                 importReadableMap();
                 return 'ReadableMap';
-              // TODO: Make EdgeInsetsPrimitive type-safe
 
+              // TODO: Make EdgeInsetsPrimitive type-safe
               case 'EdgeInsetsPrimitive':
                 importReadableMap();
                 return 'ReadableMap';
-
               default:
                 elementType.name;
                 throw new Error(
@@ -193,14 +171,13 @@ function toJavaType(typeAnnotation, addImport) {
                 );
             }
           }
-          // Arrays
 
+          // Arrays
           case 'ArrayTypeAnnotation': {
             const pojoTypeAliasTypeAnnotation = elementType.elementType;
             importArrayList();
             return `ArrayList<${pojoTypeAliasTypeAnnotation.name}>`;
           }
-
           default: {
             elementType.type;
             throw new Error(
@@ -209,11 +186,9 @@ function toJavaType(typeAnnotation, addImport) {
           }
         }
       })();
-
       importArrayList();
       return `ArrayList<${elementTypeString}>`;
     }
-
     default: {
       typeAnnotation.type;
       throw new Error(
@@ -222,17 +197,14 @@ function toJavaType(typeAnnotation, addImport) {
     }
   }
 }
-
 function toJavaMemberName(property) {
   return `m${capitalize(property.name)}`;
 }
-
 function toJavaMemberDeclaration(property, addImport) {
   const type = toJavaType(property.typeAnnotation, addImport);
   const memberName = toJavaMemberName(property);
   return `private ${type} ${memberName};`;
 }
-
 function toJavaGetter(property, addImport) {
   const type = toJavaType(property.typeAnnotation, addImport);
   const getterName = `get${capitalize(property.name)}`;
@@ -243,14 +215,11 @@ public ${type} ${getterName}() {
   return ${memberName};
 }`;
 }
-
 function serializePojo(pojo, basePackageName) {
   const importSet = new Set();
-
   const addImport = $import => {
     importSet.add($import);
   };
-
   addImport('com.facebook.proguard.annotations.DoNotStrip');
   const indent = ' '.repeat(2);
   const members = pojo.properties
@@ -288,7 +257,6 @@ ${getters}
 }
 `;
 }
-
 module.exports = {
   serializePojo,
 };

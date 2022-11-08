@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 const EMPTY_NATIVE_MODULES = {

@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function ownKeys(object, enumerableOnly) {
@@ -21,7 +22,6 @@ function ownKeys(object, enumerableOnly) {
   }
   return keys;
 }
-
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = null != arguments[i] ? arguments[i] : {};
@@ -44,7 +44,6 @@ function _objectSpread(target) {
   }
   return target;
 }
-
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -58,7 +57,6 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-
 function _slicedToArray(arr, i) {
   return (
     _arrayWithHoles(arr) ||
@@ -67,13 +65,11 @@ function _slicedToArray(arr, i) {
     _nonIterableRest()
   );
 }
-
 function _nonIterableRest() {
   throw new TypeError(
     'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.',
   );
 }
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -83,13 +79,11 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
     return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-
 function _iterableToArrayLimit(arr, i) {
   var _i =
     arr == null
@@ -118,21 +112,17 @@ function _iterableToArrayLimit(arr, i) {
   }
   return _arr;
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 const _require = require('../utils.js'),
   resolveTypeAnnotation = _require.resolveTypeAnnotation,
   getTypes = _require.getTypes,
   visit = _require.visit,
   isModuleRegistryCall = _require.isModuleRegistryCall;
-
 const _require2 = require('./utils'),
   unwrapNullable = _require2.unwrapNullable,
   wrapNullable = _require2.wrapNullable;
-
 const _require3 = require('./errors.js'),
   IncorrectlyParameterizedTypeScriptGenericParserError =
     _require3.IncorrectlyParameterizedTypeScriptGenericParserError,
@@ -171,13 +161,10 @@ const _require3 = require('./errors.js'),
     _require3.IncorrectModuleRegistryCallArityParserError,
   IncorrectModuleRegistryCallArgumentTypeParserError =
     _require3.IncorrectModuleRegistryCallArgumentTypeParserError;
-
 const invariant = require('invariant');
-
 function nullGuard(fn) {
   return fn();
 }
-
 function translateTypeAnnotation(
   hasteModuleName,
   /**
@@ -195,7 +182,6 @@ function translateTypeAnnotation(
     nullable = _resolveTypeAnnotatio.nullable,
     typeAnnotation = _resolveTypeAnnotatio.typeAnnotation,
     typeAliasResolutionStatus = _resolveTypeAnnotatio.typeAliasResolutionStatus;
-
   switch (typeAnnotation.type) {
     case 'TSTypeReference': {
       switch (typeAnnotation.typeName.name) {
@@ -205,7 +191,6 @@ function translateTypeAnnotation(
             name: 'RootTag',
           });
         }
-
         case 'Promise': {
           assertGenericTypeAnnotationHasExactlyOneTypeParameter(
             hasteModuleName,
@@ -215,14 +200,12 @@ function translateTypeAnnotation(
             type: 'PromiseTypeAnnotation',
           });
         }
-
         case 'Array':
         case 'ReadonlyArray': {
           assertGenericTypeAnnotationHasExactlyOneTypeParameter(
             hasteModuleName,
             typeAnnotation,
           );
-
           try {
             /**
              * TODO(T72031674): Migrate all our NativeModule specs to not use
@@ -249,7 +232,6 @@ function translateTypeAnnotation(
               _unwrapNullable2 = _slicedToArray(_unwrapNullable, 2),
               elementType = _unwrapNullable2[0],
               isElementTypeNullable = _unwrapNullable2[1];
-
             if (elementType.type === 'VoidTypeAnnotation') {
               throw new UnsupportedArrayElementTypeAnnotationParserError(
                 hasteModuleName,
@@ -258,7 +240,6 @@ function translateTypeAnnotation(
                 'void',
               );
             }
-
             if (elementType.type === 'PromiseTypeAnnotation') {
               throw new UnsupportedArrayElementTypeAnnotationParserError(
                 hasteModuleName,
@@ -267,7 +248,6 @@ function translateTypeAnnotation(
                 'Promise',
               );
             }
-
             if (elementType.type === 'FunctionTypeAnnotation') {
               throw new UnsupportedArrayElementTypeAnnotationParserError(
                 hasteModuleName,
@@ -276,7 +256,6 @@ function translateTypeAnnotation(
                 'FunctionTypeAnnotation',
               );
             }
-
             const finalTypeAnnotation = {
               type: 'ArrayTypeAnnotation',
               elementType: wrapNullable(isElementTypeNullable, elementType),
@@ -288,7 +267,6 @@ function translateTypeAnnotation(
             });
           }
         }
-
         case 'Readonly': {
           assertGenericTypeAnnotationHasExactlyOneTypeParameter(
             hasteModuleName,
@@ -302,38 +280,32 @@ function translateTypeAnnotation(
             tryParse,
           );
         }
-
         case 'Stringish': {
           return wrapNullable(nullable, {
             type: 'StringTypeAnnotation',
           });
         }
-
         case 'Int32': {
           return wrapNullable(nullable, {
             type: 'Int32TypeAnnotation',
           });
         }
-
         case 'Double': {
           return wrapNullable(nullable, {
             type: 'DoubleTypeAnnotation',
           });
         }
-
         case 'Float': {
           return wrapNullable(nullable, {
             type: 'FloatTypeAnnotation',
           });
         }
-
         case 'UnsafeObject':
         case 'Object': {
           return wrapNullable(nullable, {
             type: 'GenericObjectTypeAnnotation',
           });
         }
-
         default: {
           throw new UnsupportedTypeScriptGenericParserError(
             hasteModuleName,
@@ -342,7 +314,6 @@ function translateTypeAnnotation(
         }
       }
     }
-
     case 'TSTypeLiteral': {
       const objectTypeAnnotation = {
         type: 'ObjectTypeAnnotation',
@@ -357,12 +328,10 @@ function translateTypeAnnotation(
                   property.type,
                 );
               }
-
               const _property$optional = property.optional,
                 optional =
                   _property$optional === void 0 ? false : _property$optional,
                 key = property.key;
-
               const _unwrapNullable3 = unwrapNullable(
                   translateTypeAnnotation(
                     hasteModuleName,
@@ -375,7 +344,6 @@ function translateTypeAnnotation(
                 _unwrapNullable4 = _slicedToArray(_unwrapNullable3, 2),
                 propertyTypeAnnotation = _unwrapNullable4[0],
                 isPropertyNullable = _unwrapNullable4[1];
-
               if (propertyTypeAnnotation.type === 'FunctionTypeAnnotation') {
                 throw new UnsupportedObjectPropertyValueTypeAnnotationParserError(
                   hasteModuleName,
@@ -384,7 +352,6 @@ function translateTypeAnnotation(
                   propertyTypeAnnotation.type,
                 );
               }
-
               if (propertyTypeAnnotation.type === 'VoidTypeAnnotation') {
                 throw new UnsupportedObjectPropertyValueTypeAnnotationParserError(
                   hasteModuleName,
@@ -393,7 +360,6 @@ function translateTypeAnnotation(
                   'void',
                 );
               }
-
               if (propertyTypeAnnotation.type === 'PromiseTypeAnnotation') {
                 throw new UnsupportedObjectPropertyValueTypeAnnotationParserError(
                   hasteModuleName,
@@ -402,7 +368,6 @@ function translateTypeAnnotation(
                   'Promise',
                 );
               }
-
               return {
                 name: key.name,
                 optional,
@@ -415,15 +380,15 @@ function translateTypeAnnotation(
           })
           .filter(Boolean),
       };
-
       if (!typeAliasResolutionStatus.successful) {
         return wrapNullable(nullable, objectTypeAnnotation);
       }
+
       /**
        * All aliases RHS are required.
        */
-
       aliasMap[typeAliasResolutionStatus.aliasName] = objectTypeAnnotation;
+
       /**
        * Nullability of type aliases is transitive.
        *
@@ -453,37 +418,31 @@ function translateTypeAnnotation(
        *     Hence, it's better to manage nullability within the actual TypeAliasTypeAnnotation nodes, and not the
        *     associated ObjectTypeAnnotations.
        */
-
       return wrapNullable(nullable, {
         type: 'TypeAliasTypeAnnotation',
         name: typeAliasResolutionStatus.aliasName,
       });
     }
-
     case 'TSBooleanKeyword': {
       return wrapNullable(nullable, {
         type: 'BooleanTypeAnnotation',
       });
     }
-
     case 'TSNumberKeyword': {
       return wrapNullable(nullable, {
         type: 'NumberTypeAnnotation',
       });
     }
-
     case 'TSVoidKeyword': {
       return wrapNullable(nullable, {
         type: 'VoidTypeAnnotation',
       });
     }
-
     case 'TSStringKeyword': {
       return wrapNullable(nullable, {
         type: 'StringTypeAnnotation',
       });
     }
-
     case 'TSFunctionType': {
       return wrapNullable(
         nullable,
@@ -496,7 +455,6 @@ function translateTypeAnnotation(
         ),
       );
     }
-
     default: {
       throw new UnsupportedTypeScriptTypeAnnotationParserError(
         hasteModuleName,
@@ -505,7 +463,6 @@ function translateTypeAnnotation(
     }
   }
 }
-
 function assertGenericTypeAnnotationHasExactlyOneTypeParameter(
   moduleName,
   /**
@@ -519,12 +476,10 @@ function assertGenericTypeAnnotationHasExactlyOneTypeParameter(
       typeAnnotation,
     );
   }
-
   invariant(
     typeAnnotation.typeParameters.type === 'TSTypeParameterInstantiation',
     "assertGenericTypeAnnotationHasExactlyOneTypeParameter: Type parameters must be an AST node of type 'TSTypeParameterInstantiation'",
   );
-
   if (typeAnnotation.typeParameters.params.length !== 1) {
     throw new IncorrectlyParameterizedTypeScriptGenericParserError(
       moduleName,
@@ -532,16 +487,15 @@ function assertGenericTypeAnnotationHasExactlyOneTypeParameter(
     );
   }
 }
-
 function translateFunctionTypeAnnotation(
-  hasteModuleName, // TODO(T108222691): Use flow-types for @babel/parser
+  hasteModuleName,
+  // TODO(T108222691): Use flow-types for @babel/parser
   typescriptFunctionTypeAnnotation,
   types,
   aliasMap,
   tryParse,
 ) {
   const params = [];
-
   for (const typeScriptParam of typescriptFunctionTypeAnnotation.parameters) {
     const parsedParam = tryParse(() => {
       if (typeScriptParam.typeAnnotation == null) {
@@ -550,9 +504,7 @@ function translateFunctionTypeAnnotation(
           hasteModuleName,
         );
       }
-
       const paramName = typeScriptParam.name;
-
       const _unwrapNullable5 = unwrapNullable(
           translateTypeAnnotation(
             hasteModuleName,
@@ -565,7 +517,6 @@ function translateFunctionTypeAnnotation(
         _unwrapNullable6 = _slicedToArray(_unwrapNullable5, 2),
         paramTypeAnnotation = _unwrapNullable6[0],
         isParamTypeAnnotationNullable = _unwrapNullable6[1];
-
       if (paramTypeAnnotation.type === 'VoidTypeAnnotation') {
         throw new UnsupportedFunctionParamTypeAnnotationParserError(
           hasteModuleName,
@@ -574,7 +525,6 @@ function translateFunctionTypeAnnotation(
           'void',
         );
       }
-
       if (paramTypeAnnotation.type === 'PromiseTypeAnnotation') {
         throw new UnsupportedFunctionParamTypeAnnotationParserError(
           hasteModuleName,
@@ -583,7 +533,6 @@ function translateFunctionTypeAnnotation(
           'Promise',
         );
       }
-
       return {
         name: typeScriptParam.name,
         optional: Boolean(typeScriptParam.optional),
@@ -593,12 +542,10 @@ function translateFunctionTypeAnnotation(
         ),
       };
     });
-
     if (parsedParam != null) {
       params.push(parsedParam);
     }
   }
-
   const _unwrapNullable7 = unwrapNullable(
       translateTypeAnnotation(
         hasteModuleName,
@@ -611,7 +558,6 @@ function translateFunctionTypeAnnotation(
     _unwrapNullable8 = _slicedToArray(_unwrapNullable7, 2),
     returnTypeAnnotation = _unwrapNullable8[0],
     isReturnTypeAnnotationNullable = _unwrapNullable8[1];
-
   if (returnTypeAnnotation.type === 'FunctionTypeAnnotation') {
     throw new UnsupportedFunctionReturnTypeAnnotationParserError(
       hasteModuleName,
@@ -619,7 +565,6 @@ function translateFunctionTypeAnnotation(
       'FunctionTypeAnnotation',
     );
   }
-
   return {
     type: 'FunctionTypeAnnotation',
     returnTypeAnnotation: wrapNullable(
@@ -629,9 +574,9 @@ function translateFunctionTypeAnnotation(
     params,
   };
 }
-
 function buildPropertySchema(
-  hasteModuleName, // TODO(T108222691): Use flow-types for @babel/parser
+  hasteModuleName,
+  // TODO(T108222691): Use flow-types for @babel/parser
   property,
   types,
   aliasMap,
@@ -642,12 +587,9 @@ function buildPropertySchema(
   let value =
     property.type === 'TSMethodSignature' ? property : property.typeAnnotation;
   const methodName = key.name;
-
   var _resolveTypeAnnotatio2 = resolveTypeAnnotation(value, types);
-
   nullable = _resolveTypeAnnotatio2.nullable;
   value = _resolveTypeAnnotatio2.typeAnnotation;
-
   if (value.type !== 'TSFunctionType' && value.type !== 'TSMethodSignature') {
     throw new UnsupportedModulePropertyParserError(
       hasteModuleName,
@@ -656,7 +598,6 @@ function buildPropertySchema(
       value.type,
     );
   }
-
   return {
     name: methodName,
     optional: Boolean(property.optional),
@@ -672,7 +613,6 @@ function buildPropertySchema(
     ),
   };
 }
-
 function isModuleInterface(node) {
   return (
     node.type === 'TSInterfaceDeclaration' &&
@@ -681,7 +621,6 @@ function isModuleInterface(node) {
     node.extends[0].expression.name === 'TurboModule'
   );
 }
-
 function buildModuleSchema(
   hasteModuleName,
   /**
@@ -692,14 +631,12 @@ function buildModuleSchema(
 ) {
   const types = getTypes(ast);
   const moduleSpecs = Object.values(types).filter(isModuleInterface);
-
   if (moduleSpecs.length === 0) {
     throw new ModuleTypeScriptInterfaceNotFoundParserError(
       hasteModuleName,
       ast,
     );
   }
-
   if (moduleSpecs.length > 1) {
     throw new MoreThanOneModuleTypeScriptInterfaceParserError(
       hasteModuleName,
@@ -707,17 +644,16 @@ function buildModuleSchema(
       moduleSpecs.map(node => node.id.name),
     );
   }
-
   const _moduleSpecs = _slicedToArray(moduleSpecs, 1),
     moduleSpec = _moduleSpecs[0];
-
   if (moduleSpec.id.name !== 'Spec') {
     throw new MisnamedModuleTypeScriptInterfaceParserError(
       hasteModuleName,
       moduleSpec.id,
     );
-  } // Parse Module Names
+  }
 
+  // Parse Module Names
   const moduleName = tryParse(() => {
     const callExpressions = [];
     visit(ast, {
@@ -727,14 +663,12 @@ function buildModuleSchema(
         }
       },
     });
-
     if (callExpressions.length === 0) {
       throw new UnusedModuleTypeScriptInterfaceParserError(
         hasteModuleName,
         moduleSpec,
       );
     }
-
     if (callExpressions.length > 1) {
       throw new MoreThanOneModuleRegistryCallsParserError(
         hasteModuleName,
@@ -742,11 +676,9 @@ function buildModuleSchema(
         callExpressions.length,
       );
     }
-
     const callExpression = callExpressions[0];
     const typeParameters = callExpression.typeParameters;
     const methodName = callExpression.callee.property.name;
-
     if (callExpression.arguments.length !== 1) {
       throw new IncorrectModuleRegistryCallArityParserError(
         hasteModuleName,
@@ -755,7 +687,6 @@ function buildModuleSchema(
         callExpression.arguments.length,
       );
     }
-
     if (callExpression.arguments[0].type !== 'StringLiteral') {
       const type = callExpression.arguments[0].type;
       throw new IncorrectModuleRegistryCallArgumentTypeParserError(
@@ -765,9 +696,7 @@ function buildModuleSchema(
         type,
       );
     }
-
     const $moduleName = callExpression.arguments[0].value;
-
     if (typeParameters == null) {
       throw new UntypedModuleRegistryCallParserError(
         hasteModuleName,
@@ -776,7 +705,6 @@ function buildModuleSchema(
         $moduleName,
       );
     }
-
     if (
       typeParameters.type !== 'TSTypeParameterInstantiation' ||
       typeParameters.params.length !== 1 ||
@@ -790,14 +718,14 @@ function buildModuleSchema(
         $moduleName,
       );
     }
-
     return $moduleName;
   });
-  const moduleNames = moduleName == null ? [] : [moduleName]; // Some module names use platform suffix to indicate platform-exclusive modules.
+  const moduleNames = moduleName == null ? [] : [moduleName];
+
+  // Some module names use platform suffix to indicate platform-exclusive modules.
   // Eventually this should be made explicit in the Flow type itself.
   // Also check the hasteModuleName for platform suffix.
   // Note: this shape is consistent with ComponentSchema.
-
   const excludedPlatforms = [];
   const namesToValidate = [...moduleNames, hasteModuleName];
   namesToValidate.forEach(name => {
@@ -806,8 +734,9 @@ function buildModuleSchema(
     } else if (name.endsWith('IOS')) {
       excludedPlatforms.push('android');
     }
-  }); // $FlowFixMe[missing-type-arg]
+  });
 
+  // $FlowFixMe[missing-type-arg]
   return moduleSpec.body.body
     .filter(
       property =>
@@ -855,7 +784,6 @@ function buildModuleSchema(
       },
     );
 }
-
 module.exports = {
   buildModuleSchema,
 };

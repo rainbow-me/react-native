@@ -8,6 +8,7 @@
  * @format
  * @lint-ignore-every LICENSELINT
  */
+
 'use strict';
 
 const EMPTY_NATIVE_MODULE = `

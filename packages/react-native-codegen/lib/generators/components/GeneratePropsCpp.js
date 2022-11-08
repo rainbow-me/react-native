@@ -7,11 +7,14 @@
  *
  * @format
  */
+
 'use strict';
 
 const _require = require('./CppHelpers'),
   convertDefaultTypeToString = _require.convertDefaultTypeToString,
-  getImports = _require.getImports; // File path -> contents
+  getImports = _require.getImports;
+
+// File path -> contents
 
 const FileTemplate = ({libraryName, imports, componentClasses}) => `
 /**
@@ -34,7 +37,6 @@ ${componentClasses}
 } // namespace react
 } // namespace facebook
 `;
-
 const ComponentTemplate = ({className, extendClasses, props}) =>
   `
 ${className}::${className}(
@@ -45,7 +47,6 @@ ${className}::${className}(
     ${props}
       {}
 `.trim();
-
 function generatePropsString(componentName, component) {
   return component.props
     .map(prop => {
@@ -54,7 +55,6 @@ function generatePropsString(componentName, component) {
     })
     .join(',\n' + '    ');
 }
-
 function getClassExtendString(component) {
   const extendString =
     ' ' +
@@ -65,12 +65,10 @@ function getClassExtendString(component) {
             switch (extendProps.knownTypeName) {
               case 'ReactNativeCoreViewProps':
                 return 'ViewProps(context, sourceProps, rawProps)';
-
               default:
                 extendProps.knownTypeName;
                 throw new Error('Invalid knownTypeName');
             }
-
           default:
             extendProps.type;
             throw new Error('Invalid extended type');
@@ -80,7 +78,6 @@ function getClassExtendString(component) {
     `${component.props.length > 0 ? ',' : ''}`;
   return extendString;
 }
-
 module.exports = {
   generate(libraryName, schema, packageName, assumeNonnull = false) {
     const fileName = 'Props.cpp';
@@ -91,17 +88,14 @@ module.exports = {
     const componentProps = Object.keys(schema.modules)
       .map(moduleName => {
         const module = schema.modules[moduleName];
-
         if (module.type !== 'Component') {
           return;
         }
-
-        const components = module.components; // No components in this module
-
+        const components = module.components;
+        // No components in this module
         if (components == null) {
           return null;
         }
-
         return Object.keys(components)
           .filter(componentName => {
             const component = components[componentName];
@@ -115,8 +109,8 @@ module.exports = {
             const newName = `${componentName}Props`;
             const propsString = generatePropsString(componentName, component);
             const extendString = getClassExtendString(component);
-            const imports = getImports(component.props); // $FlowFixMe[method-unbinding] added when improving typing for this parameters
-
+            const imports = getImports(component.props);
+            // $FlowFixMe[method-unbinding] added when improving typing for this parameters
             imports.forEach(allImports.add, allImports);
             const replacedTemplate = ComponentTemplate({
               className: newName,

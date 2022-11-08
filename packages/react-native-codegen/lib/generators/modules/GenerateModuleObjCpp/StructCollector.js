@@ -7,6 +7,7 @@
  *
  * @format
  */
+
 'use strict';
 
 function ownKeys(object, enumerableOnly) {
@@ -21,7 +22,6 @@ function ownKeys(object, enumerableOnly) {
   }
   return keys;
 }
-
 function _objectSpread(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = null != arguments[i] ? arguments[i] : {};
@@ -44,7 +44,6 @@ function _objectSpread(target) {
   }
   return target;
 }
-
 function _slicedToArray(arr, i) {
   return (
     _arrayWithHoles(arr) ||
@@ -53,13 +52,11 @@ function _slicedToArray(arr, i) {
     _nonIterableRest()
   );
 }
-
 function _nonIterableRest() {
   throw new TypeError(
     'Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.',
   );
 }
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === 'string') return _arrayLikeToArray(o, minLen);
@@ -69,13 +66,11 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
     return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
   return arr2;
 }
-
 function _iterableToArrayLimit(arr, i) {
   var _i =
     arr == null
@@ -104,11 +99,9 @@ function _iterableToArrayLimit(arr, i) {
   }
   return _arr;
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -122,25 +115,20 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 }
-
 const _require = require('../../Utils'),
   capitalize = _require.capitalize;
-
 const _require2 = require('../../../parsers/flow/modules/utils'),
   unwrapNullable = _require2.unwrapNullable,
   wrapNullable = _require2.wrapNullable;
-
 class StructCollector {
   constructor() {
     _defineProperty(this, '_structs', new Map());
   }
-
   process(structName, structContext, resolveAlias, nullableTypeAnnotation) {
     const _unwrapNullable = unwrapNullable(nullableTypeAnnotation),
       _unwrapNullable2 = _slicedToArray(_unwrapNullable, 2),
       typeAnnotation = _unwrapNullable2[0],
       nullable = _unwrapNullable2[1];
-
     switch (typeAnnotation.type) {
       case 'ObjectTypeAnnotation': {
         this._insertStruct(
@@ -149,20 +137,17 @@ class StructCollector {
           resolveAlias,
           typeAnnotation,
         );
-
         return wrapNullable(nullable, {
           type: 'TypeAliasTypeAnnotation',
           name: structName,
         });
       }
-
       case 'ArrayTypeAnnotation': {
         if (typeAnnotation.elementType == null) {
           return wrapNullable(nullable, {
             type: 'ArrayTypeAnnotation',
           });
         }
-
         return wrapNullable(nullable, {
           type: 'ArrayTypeAnnotation',
           elementType: this.process(
@@ -173,22 +158,17 @@ class StructCollector {
           ),
         });
       }
-
       case 'TypeAliasTypeAnnotation': {
         this._insertAlias(typeAnnotation.name, structContext, resolveAlias);
-
         return wrapNullable(nullable, typeAnnotation);
       }
-
       default: {
         return wrapNullable(nullable, typeAnnotation);
       }
     }
   }
-
   _insertAlias(aliasName, structContext, resolveAlias) {
     const usedStruct = this._structs.get(aliasName);
-
     if (usedStruct == null) {
       this._insertStruct(
         aliasName,
@@ -202,7 +182,6 @@ class StructCollector {
       );
     }
   }
-
   _insertStruct(structName, structContext, resolveAlias, objectTypeAnnotation) {
     // $FlowFixMe[missing-type-arg]
     const properties = objectTypeAnnotation.properties.map(property => {
@@ -220,7 +199,6 @@ class StructCollector {
         },
       );
     });
-
     switch (structContext) {
       case 'REGULAR':
         this._structs.set(structName, {
@@ -228,33 +206,26 @@ class StructCollector {
           context: 'REGULAR',
           properties: properties,
         });
-
         break;
-
       case 'CONSTANTS':
         this._structs.set(structName, {
           name: structName,
           context: 'CONSTANTS',
           properties: properties,
         });
-
         break;
-
       default:
         structContext;
         throw new Error(`Detected an invalid struct context: ${structContext}`);
     }
   }
-
   getAllStructs() {
     return [...this._structs.values()];
   }
-
   getStruct(name) {
     return this._structs.get(name);
   }
 }
-
 module.exports = {
   StructCollector,
 };
